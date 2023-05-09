@@ -1,0 +1,6 @@
+remote_theme: pages-themes/leap-day@v0.2.0
+plugins:
+- jekyll-remote-theme
+title: Exuma Contracs Documentation
+description: The complete documentation for all Exuma contracts as well es the test coverrage reports.
+show_downloads: false

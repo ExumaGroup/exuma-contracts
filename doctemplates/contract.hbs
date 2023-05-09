@@ -1,0 +1,60 @@
+{{fileHeader}}
+
+{{>common}}
+{{#if (directParents)}}
+
+***
+
+{{#hsection}}
+{{h}} Implements
+
+{{#each (directParents)}}
+- [{{this.name}}]({{this.docpath}})
+{{/each}}
+{{/hsection}}
+{{/if}}
+{{#if (allEvents)}}
+
+***
+
+{{#hsection}}
+{{h}} Events
+
+{{#each (allEvents)}}
+{{#hsection}}
+{{>item}}
+{{/hsection}}
+
+{{/each}}
+{{/hsection}}
+{{/if}}
+{{#if functions}}
+
+***
+
+{{#hsection}}
+{{h}} Functions
+
+{{#each functions}}
+{{#hsection}}
+{{>item}}
+{{/hsection}}
+
+{{/each}}
+{{/hsection}}
+{{/if}}
+{{!--
+{{h}} Original way that renders everything....
+
+{{#each items}}
+{{#hsection}}
+{{>item}}
+{{/hsection}}
+
+{{/each}} --}}
+{{!-- {{#each items}}
+{{#unless (eq nodeType "EventDefinition")}} <-- exclude one type.... {{#hsection}} {{>item}}
+	{{/hsection}}
+	{{/unless}}
+
+	{{/each}} --}}

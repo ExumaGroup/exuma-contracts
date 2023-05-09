@@ -1,0 +1,51 @@
+{
+	"extends": [
+		"solhint:default",
+		"solhint:recommended"
+	],
+	"rules": {
+		"avoid-suicide": "error",
+		"avoid-sha3": "error",
+		"code-complexity": [
+			"warn",
+			7
+		],
+		"compiler-version": [
+			"error",
+			"^0.8.0"
+		],
+		"comprehensive-interface": "error",
+		"constructor-syntax": "error",
+		"max-states-count": [
+			"error",
+			15
+		],
+		"max-line-length": [
+			"warn",
+			145
+		],
+		"no-empty-blocks": "error",
+		"no-unused-vars": "error",
+		"not-rely-on-time": "warn",
+		"payable-fallback": "error",
+		"const-name-snakecase": "error",
+		"contract-name-camelcase": "error",
+		"event-name-camelcase": "error",
+		"func-name-mixedcase": "error",
+		"func-param-name-mixedcase": "error",
+		"modifier-name-mixedcase": "error",
+		"private-vars-leading-underscore": [
+			"error",
+			{
+				"strict": true
+			}
+		],
+		"ordering": "warn",
+		"func-visibility": [
+			"error",
+			{
+				"ignoreConstructors": true
+			}
+		]
+	}
+}
