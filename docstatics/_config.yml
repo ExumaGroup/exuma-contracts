@@ -4,3 +4,4 @@ plugins:
 title: Exuma Contracs Documentation
 description: The complete documentation for all Exuma contracts as well es the test coverrage reports.
 show_downloads: false
+baseurl: /exuma-contracts
