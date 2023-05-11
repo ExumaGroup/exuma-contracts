@@ -1,4 +1,3 @@
-import { HardhatUserConfig } from "hardhat/config";
 import "@nomicfoundation/hardhat-toolbox";
 import "hardhat-abi-exporter";
 import "hardhat-contract-sizer";
@@ -8,7 +7,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 import { PageAssigner } from "solidity-docgen/dist/site";
-const excludePath: RegExp[] = [/\/mocks\//];
+const excludePath: RegExp[] = [/\/mocks\//, /\/compare\//];
 const pa: PageAssigner = (item, file, config) =>
 {
 	for (const excludeMe of excludePath)
@@ -28,7 +27,7 @@ const accounts = {
 	// accountsBalance: ethers.utils.parseEther("1");
 };
 
-const config: HardhatUserConfig = {
+const config = {
 	abiExporter:
 		[
 			{
@@ -82,6 +81,17 @@ const config: HardhatUserConfig = {
 					{
 						enabled: true,
 						runs: 500000
+					}
+				}
+			},
+			{
+				version: "0.6.12",
+				settings:
+				{
+					optimizer:
+					{
+						enabled: true,
+						runs: 10
 					}
 				}
 			}

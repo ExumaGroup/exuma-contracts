@@ -36,7 +36,7 @@ export function fileHeader(this: DocItemWithContext)
 
 		let ret = "---\n";
 		ret += `filename: ${purePath}\n`;
-		ret += `type: ${dic.contract?.contractKind}\n`;
+		ret += `type: ${dic.item.contractKind}\n`;
 		ret += "---";
 		return ret;
 	}
