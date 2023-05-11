@@ -49,7 +49,7 @@ function extractDocPath(dic: DocItemContext): string
 	let result = dic.page.replace(regex, "");
 	if (result[0] !== "/")
 	{
-		result = "/exuma-contracts/" + result;
+		result = "/" + result;
 	}
 	return "/exuma-contracts" + result;
 }
