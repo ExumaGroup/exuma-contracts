@@ -1,15 +1,16 @@
-{{h}} {{name}}
-
+{{h}} {{anchor}}`{{name}}`
 {{#if signature}}
 ```solidity
 {{{signature}}}
 ```
 {{/if}}
-
+{{#if natspec.notice}}
 {{{natspec.notice}}}
-
+{{/if}}
 {{#if natspec.dev}}
-_{{{natspec.dev}}}_
+<div class="dev">
+{{{smartJoinLines natspec.dev "_"}}}
+</div>
 {{/if}}
 
 {{#if natspec.params}}

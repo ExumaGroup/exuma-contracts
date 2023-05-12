@@ -28,6 +28,20 @@
 {{/each}}
 {{/hsection}}
 {{/if}}
+
+{{#if modifiers}}
+{{#hsection}}
+{{h}} Modifiers
+
+{{#each modifiers}}
+{{#hsection}}
+{{>item}}
+{{/hsection}}
+
+{{/each}}
+{{/hsection}}
+{{/if}}
+
 {{#if functions}}
 
 ***
@@ -36,25 +50,18 @@
 {{h}} Functions
 
 {{#each functions}}
+{{#unless (eq visibility "internal")}}
 {{#hsection}}
+```solidity
+function {{name}}(
+{{#natspec.params}}
+{{#lookup ../args.types @index}}{{/lookup}} {{param}}{{#if @last}}{{else}},{{/if}}
+{{/natspec.params}}
+) {{visibility}}{{#if outputs}} returns ({{outputs}}){{/if}}
+```
 {{>item}}
 {{/hsection}}
-
+{{/unless}}
 {{/each}}
 {{/hsection}}
 {{/if}}
-{{!--
-{{h}} Original way that renders everything....
-
-{{#each items}}
-{{#hsection}}
-{{>item}}
-{{/hsection}}
-
-{{/each}} --}}
-{{!-- {{#each items}}
-{{#unless (eq nodeType "EventDefinition")}} <-- exclude one type.... {{#hsection}} {{>item}}
-	{{/hsection}}
-	{{/unless}}
-
-	{{/each}} --}}
