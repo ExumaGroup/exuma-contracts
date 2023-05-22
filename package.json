@@ -22,7 +22,7 @@
     "lint-ts": "eslint . --format table",
     "lint-ts:fix": "eslint . --format table --fix",
     "test": "hardhat test",
-    "test:coverage": "npm run build && cross-env NODE_OPTIONS=\"--max-old-space-size=2048\" hardhat coverage",
+    "test:coverage": "npm run build && hardhat coverage",
     "test:gas": "cross-env REPORT_GAS=true npm test"
   },
   "devDependencies": {

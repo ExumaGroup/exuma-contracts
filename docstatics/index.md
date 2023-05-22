@@ -1,5 +1,6 @@
 ---
-filename: index
+filename: /exuma-contracts/index
+slug: index
 type: toc
 ---
 
@@ -20,3 +21,6 @@ type: toc
 - [{{ page.title }}]({{ page.filename }})
 
 {% endfor %}
+
+{{ page.slug }}
+{{ page.anchor }}

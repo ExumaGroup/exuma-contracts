@@ -1,6 +1,15 @@
 import { ASTDereferencer, findAll } from "solidity-ast/utils";
 import { DocItemContext, DocItemWithContext, DOC_ITEM_CONTEXT } from "solidity-docgen/dist/site";
 
+export const slug = (str:string) =>
+{
+	if (str === undefined)
+	{
+		throw new Error("Missing argument");
+	}
+	return str.replace(/\W/g, "-");
+};
+
 export function smartJoinLines(text?: string, paragraphWrap?: string)
 {
 	if (typeof text === "string")
@@ -72,6 +81,7 @@ export function fileHeader(this: DocItemWithContext)
 
 		let ret = "---\n";
 		ret += `filename: ${purePath}\n`;
+		ret += `slug: ${dic.item.canonicalName}\n`;
 		ret += `type: ${dic.item.contractKind}\n`;
 		ret += "---";
 		return ret;
