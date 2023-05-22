@@ -1,4 +1,4 @@
-{{h}} {{anchor}}`{{name}}`
+{{h}} [xref:#{{anchor}}[{{name}}]]
 {{#if signature}}
 ```solidity
 {{{signature}}}
@@ -8,7 +8,7 @@
 {{{natspec.notice}}}
 {{/if}}
 {{#if natspec.dev}}
-<div class="dev">
+<div class="dev" markdown="1">
 {{{smartJoinLines natspec.dev "_"}}}
 </div>
 {{/if}}
