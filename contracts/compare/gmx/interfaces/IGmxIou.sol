@@ -2,6 +2,6 @@
 
 pragma solidity 0.6.12;
 
-interface IGmxIou {
+interface IGmxIou_Original {
     function mint(address account, uint256 amount) external returns (bool);
 }

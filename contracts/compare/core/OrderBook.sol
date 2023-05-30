@@ -13,10 +13,10 @@ import "./interfaces/IRouter.sol";
 import "./interfaces/IVault.sol";
 import "./interfaces/IOrderBook.sol";
 
-contract OrderBook is ReentrancyGuard, IOrderBook {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
-    using Address for address payable;
+contract OrderBook_Original is ReentrancyGuard_Original, IOrderBook_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
+    using Address_Original for address payable;
 
     uint256 public constant PRICE_PRECISION = 1e30;
     uint256 public constant USDG_PRECISION = 1e18;
@@ -327,7 +327,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
             require(msg.value == _executionFee.add(_amountIn), "OrderBook: incorrect value transferred");
         } else {
             require(msg.value == _executionFee, "OrderBook: incorrect execution fee transferred");
-            IRouter(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
+            IRouter_Original(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
         }
 
         _createSwapOrder(msg.sender, _path, _amountIn, _minOut, _triggerRatio, _triggerAboveThreshold, _shouldUnwrap, _executionFee);
@@ -395,7 +395,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
         if (order.path[0] == weth) {
             _transferOutETH(order.executionFee.add(order.amountIn), msg.sender);
         } else {
-            IERC20(order.path[0]).safeTransfer(msg.sender, order.amountIn);
+            IERC20_Original(order.path[0]).safeTransfer(msg.sender, order.amountIn);
             _transferOutETH(order.executionFee, msg.sender);
         }
 
@@ -414,10 +414,10 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
 
     function getUsdgMinPrice(address _otherToken) public view returns (uint256) {
         // USDG_PRECISION is the same as 1 USDG
-        uint256 redemptionAmount = IVault(vault).getRedemptionAmount(_otherToken, USDG_PRECISION);
-        uint256 otherTokenPrice = IVault(vault).getMinPrice(_otherToken);
+        uint256 redemptionAmount = IVault_Original(vault).getRedemptionAmount(_otherToken, USDG_PRECISION);
+        uint256 otherTokenPrice = IVault_Original(vault).getMinPrice(_otherToken);
 
-        uint256 otherTokenDecimals = IVault(vault).tokenDecimals(_otherToken);
+        uint256 otherTokenDecimals = IVault_Original(vault).tokenDecimals(_otherToken);
         return redemptionAmount.mul(otherTokenPrice).div(10 ** otherTokenDecimals);
     }
 
@@ -444,13 +444,13 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
             // with both _path.length == 2 or 3 we need usdg price against _path[1]
             tokenAPrice = getUsdgMinPrice(_path[1]);
         } else {
-            tokenAPrice = IVault(vault).getMinPrice(tokenA);
+            tokenAPrice = IVault_Original(vault).getMinPrice(tokenA);
         }
 
         if (tokenB == usdg) {
             tokenBPrice = PRICE_PRECISION;
         } else {
-            tokenBPrice = IVault(vault).getMaxPrice(tokenB);
+            tokenBPrice = IVault_Original(vault).getMaxPrice(tokenB);
         }
 
         uint256 currentRatio = tokenBPrice.mul(PRICE_PRECISION).div(tokenAPrice);
@@ -495,7 +495,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
 
         delete swapOrders[_account][_orderIndex];
 
-        IERC20(order.path[0]).safeTransfer(vault, order.amountIn);
+        IERC20_Original(order.path[0]).safeTransfer(vault, order.amountIn);
 
         uint256 _amountOut;
         if (order.path[order.path.length - 1] == weth && order.shouldUnwrap) {
@@ -530,7 +530,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
         bool _raise
     ) public view returns (uint256, bool) {
         uint256 currentPrice = _maximizePrice
-            ? IVault(vault).getMaxPrice(_indexToken) : IVault(vault).getMinPrice(_indexToken);
+            ? IVault_Original(vault).getMaxPrice(_indexToken) : IVault_Original(vault).getMinPrice(_indexToken);
         bool isPriceValid = _triggerAboveThreshold ? currentPrice > _triggerPrice : currentPrice < _triggerPrice;
         if (_raise) {
             require(isPriceValid, "OrderBook: invalid price for execution");
@@ -608,21 +608,21 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
             require(msg.value == _executionFee.add(_amountIn), "OrderBook: incorrect value transferred");
         } else {
             require(msg.value == _executionFee, "OrderBook: incorrect execution fee transferred");
-            IRouter(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
+            IRouter_Original(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
         }
 
         address _purchaseToken = _path[_path.length - 1];
         uint256 _purchaseTokenAmount;
         if (_path.length > 1) {
             require(_path[0] != _purchaseToken, "OrderBook: invalid _path");
-            IERC20(_path[0]).safeTransfer(vault, _amountIn);
+            IERC20_Original(_path[0]).safeTransfer(vault, _amountIn);
             _purchaseTokenAmount = _swap(_path, _minOut, address(this));
         } else {
             _purchaseTokenAmount = _amountIn;
         }
 
         {
-            uint256 _purchaseTokenAmountUsd = IVault(vault).tokenToUsdMin(_purchaseToken, _purchaseTokenAmount);
+            uint256 _purchaseTokenAmountUsd = IVault_Original(vault).tokenToUsdMin(_purchaseToken, _purchaseTokenAmount);
             require(_purchaseTokenAmountUsd >= minPurchaseTokenAmountUsd, "OrderBook: insufficient collateral");
         }
 
@@ -712,7 +712,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
         if (order.purchaseToken == weth) {
             _transferOutETH(order.executionFee.add(order.purchaseTokenAmount), msg.sender);
         } else {
-            IERC20(order.purchaseToken).safeTransfer(msg.sender, order.purchaseTokenAmount);
+            IERC20_Original(order.purchaseToken).safeTransfer(msg.sender, order.purchaseTokenAmount);
             _transferOutETH(order.executionFee, msg.sender);
         }
 
@@ -747,7 +747,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
 
         delete increaseOrders[_address][_orderIndex];
 
-        IERC20(order.purchaseToken).safeTransfer(vault, order.purchaseTokenAmount);
+        IERC20_Original(order.purchaseToken).safeTransfer(vault, order.purchaseTokenAmount);
 
         if (order.purchaseToken != order.collateralToken) {
             address[] memory path = new address[](2);
@@ -755,10 +755,10 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
             path[1] = order.collateralToken;
 
             uint256 amountOut = _swap(path, 0, address(this));
-            IERC20(order.collateralToken).safeTransfer(vault, amountOut);
+            IERC20_Original(order.collateralToken).safeTransfer(vault, amountOut);
         }
 
-        IRouter(router).pluginIncreasePosition(order.account, order.collateralToken, order.indexToken, order.sizeDelta, order.isLong);
+        IRouter_Original(router).pluginIncreasePosition(order.account, order.collateralToken, order.indexToken, order.sizeDelta, order.isLong);
 
         // pay executor
         _transferOutETH(order.executionFee, _feeReceiver);
@@ -859,7 +859,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
 
         delete decreaseOrders[_address][_orderIndex];
 
-        uint256 amountOut = IRouter(router).pluginDecreasePosition(
+        uint256 amountOut = IRouter_Original(router).pluginDecreasePosition(
             order.account,
             order.collateralToken,
             order.indexToken,
@@ -873,7 +873,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
         if (order.collateralToken == weth) {
             _transferOutETH(amountOut, payable(order.account));
         } else {
-            IERC20(order.collateralToken).safeTransfer(order.account, amountOut);
+            IERC20_Original(order.collateralToken).safeTransfer(order.account, amountOut);
         }
 
         // pay executor
@@ -945,12 +945,12 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
 
     function _transferInETH() private {
         if (msg.value != 0) {
-            IWETH(weth).deposit{value: msg.value}();
+            IWETH_Original(weth).deposit{value: msg.value}();
         }
     }
 
     function _transferOutETH(uint256 _amountOut, address payable _receiver) private {
-        IWETH(weth).withdraw(_amountOut);
+        IWETH_Original(weth).withdraw(_amountOut);
         _receiver.sendValue(_amountOut);
     }
 
@@ -960,7 +960,7 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
         }
         if (_path.length == 3) {
             uint256 midOut = _vaultSwap(_path[0], _path[1], 0, address(this));
-            IERC20(_path[1]).safeTransfer(vault, midOut);
+            IERC20_Original(_path[1]).safeTransfer(vault, midOut);
             return _vaultSwap(_path[1], _path[2], _minOut, _receiver);
         }
 
@@ -971,11 +971,11 @@ contract OrderBook is ReentrancyGuard, IOrderBook {
         uint256 amountOut;
 
         if (_tokenOut == usdg) { // buyUSDG
-            amountOut = IVault(vault).buyUSDG(_tokenIn, _receiver);
+            amountOut = IVault_Original(vault).buyUSDG(_tokenIn, _receiver);
         } else if (_tokenIn == usdg) { // sellUSDG
-            amountOut = IVault(vault).sellUSDG(_tokenOut, _receiver);
+            amountOut = IVault_Original(vault).sellUSDG(_tokenOut, _receiver);
         } else { // swap
-            amountOut = IVault(vault).swap(_tokenIn, _tokenOut, _receiver);
+            amountOut = IVault_Original(vault).swap(_tokenIn, _tokenOut, _receiver);
         }
 
         require(amountOut >= _minOut, "OrderBook: insufficient amountOut");

@@ -11,9 +11,9 @@ import "./interfaces/IRewardDistributor.sol";
 import "./interfaces/IRewardTracker.sol";
 import "../access/Governable.sol";
 
-contract RewardDistributor is IRewardDistributor, ReentrancyGuard, Governable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract RewardDistributor_Original is IRewardDistributor_Original, ReentrancyGuard_Original, Governable_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     address public override rewardToken;
     uint256 public override tokensPerInterval;
@@ -41,8 +41,8 @@ contract RewardDistributor is IRewardDistributor, ReentrancyGuard, Governable {
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external onlyGov {
-        IERC20(_token).safeTransfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external onlyGov {
+        IERC20_Original(_token).safeTransfer(_account, _amount);
     }
 
     function updateLastDistributionTime() external onlyAdmin {
@@ -51,7 +51,7 @@ contract RewardDistributor is IRewardDistributor, ReentrancyGuard, Governable {
 
     function setTokensPerInterval(uint256 _amount) external onlyAdmin {
         require(lastDistributionTime != 0, "RewardDistributor: invalid lastDistributionTime");
-        IRewardTracker(rewardTracker).updateRewards();
+        IRewardTracker_Original(rewardTracker).updateRewards();
         tokensPerInterval = _amount;
         emit TokensPerIntervalChange(_amount);
     }
@@ -72,10 +72,10 @@ contract RewardDistributor is IRewardDistributor, ReentrancyGuard, Governable {
 
         lastDistributionTime = block.timestamp;
 
-        uint256 balance = IERC20(rewardToken).balanceOf(address(this));
+        uint256 balance = IERC20_Original(rewardToken).balanceOf(address(this));
         if (amount > balance) { amount = balance; }
 
-        IERC20(rewardToken).safeTransfer(msg.sender, amount);
+        IERC20_Original(rewardToken).safeTransfer(msg.sender, amount);
 
         emit Distribute(amount);
         return amount;

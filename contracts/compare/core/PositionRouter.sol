@@ -11,8 +11,8 @@ import "../libraries/utils/Address.sol";
 import "../peripherals/interfaces/ITimelock.sol";
 import "./BasePositionManager.sol";
 
-contract PositionRouter is BasePositionManager, IPositionRouter {
-    using Address for address;
+contract PositionRouter_Original is BasePositionManager_Original, IPositionRouter_Original {
+    using Address_Original for address;
 
     struct IncreasePositionRequest {
         address account;
@@ -182,10 +182,10 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         address _vault,
         address _router,
         address _weth,
-        address _shortsTracker,
+        address _shortsTracker_Original,
         uint256 _depositFee,
         uint256 _minExecutionFee
-    ) public BasePositionManager(_vault, _router, _shortsTracker, _weth, _depositFee) {
+    ) public BasePositionManager_Original(_vault, _router, _shortsTracker_Original, _weth, _depositFee) {
         minExecutionFee = _minExecutionFee;
     }
 
@@ -317,7 +317,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         _setTraderReferralCode(_referralCode);
 
         if (_amountIn > 0) {
-            IRouter(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
+            IRouter_Original(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
         }
 
         return _createIncreasePosition(
@@ -432,12 +432,12 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
             uint256 amountIn = request.amountIn;
 
             if (request.path.length > 1) {
-                IERC20(request.path[0]).safeTransfer(vault, request.amountIn);
+                IERC20_Original(request.path[0]).safeTransfer(vault, request.amountIn);
                 amountIn = _swap(request.path, request.minOut, address(this));
             }
 
             uint256 afterFeeAmount = _collectFees(request.account, request.path, amountIn, request.indexToken, request.isLong, request.sizeDelta);
-            IERC20(request.path[request.path.length - 1]).safeTransfer(vault, afterFeeAmount);
+            IERC20_Original(request.path[request.path.length - 1]).safeTransfer(vault, afterFeeAmount);
         }
 
         _increasePosition(request.account, request.path[request.path.length - 1], request.indexToken, request.sizeDelta, request.isLong, request.acceptablePrice);
@@ -476,7 +476,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         if (request.hasCollateralInETH) {
             _transferOutETHWithGasLimitFallbackToWeth(request.amountIn, payable(request.account));
         } else {
-            IERC20(request.path[0]).safeTransfer(request.account, request.amountIn);
+            IERC20_Original(request.path[0]).safeTransfer(request.account, request.amountIn);
         }
 
        _transferOutETHWithGasLimitFallbackToWeth(request.executionFee, _executionFeeReceiver);
@@ -514,14 +514,14 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
 
         if (amountOut > 0) {
             if (request.path.length > 1) {
-                IERC20(request.path[0]).safeTransfer(vault, amountOut);
+                IERC20_Original(request.path[0]).safeTransfer(vault, amountOut);
                 amountOut = _swap(request.path, request.minOut, address(this));
             }
 
             if (request.withdrawETH) {
                _transferOutETHWithGasLimitFallbackToWeth(amountOut, payable(request.receiver));
             } else {
-               IERC20(request.path[request.path.length - 1]).safeTransfer(request.receiver, amountOut);
+               IERC20_Original(request.path[request.path.length - 1]).safeTransfer(request.receiver, amountOut);
             }
         }
 
@@ -595,7 +595,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
 
     function _setTraderReferralCode(bytes32 _referralCode) internal {
         if (_referralCode != bytes32(0) && referralStorage != address(0)) {
-            IReferralStorage(referralStorage).setTraderReferralCode(msg.sender, _referralCode);
+            IReferralStorage_Original(referralStorage).setTraderReferralCode(msg.sender, _referralCode);
         }
     }
 
@@ -781,7 +781,7 @@ contract PositionRouter is BasePositionManager, IPositionRouter {
         }
 
         bool success;
-        try IPositionRouterCallbackReceiver(_callbackTarget).gmxPositionCallback{ gas: _gasLimit }(_key, _wasExecuted, _isIncrease) {
+        try IPositionRouterCallbackReceiver_Original(_callbackTarget).gmxPositionCallback{ gas: _gasLimit }(_key, _wasExecuted, _isIncrease) {
             success = true;
         } catch {}
 

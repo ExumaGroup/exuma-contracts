@@ -16,8 +16,8 @@ import "../access/Governable.sol";
 // and staking for the receiver
 // meant for a one-time use for a specified sender
 // requires the contract to be added as a handler for stakedGlpTracker and feeGlpTracker
-contract StakedGlpMigrator is Governable {
-    using SafeMath for uint256;
+contract StakedGlpMigrator_Original is Governable_Original {
+    using SafeMath_Original for uint256;
 
     address public sender;
     address public glp;
@@ -50,10 +50,10 @@ contract StakedGlpMigrator is Governable {
         require(_sender != address(0), "StakedGlpMigrator: transfer from the zero address");
         require(_recipient != address(0), "StakedGlpMigrator: transfer to the zero address");
 
-        IRewardTracker(stakedGlpTracker).unstakeForAccount(_sender, feeGlpTracker, _amount, _sender);
-        IRewardTracker(feeGlpTracker).unstakeForAccount(_sender, glp, _amount, _sender);
+        IRewardTracker_Original(stakedGlpTracker).unstakeForAccount(_sender, feeGlpTracker, _amount, _sender);
+        IRewardTracker_Original(feeGlpTracker).unstakeForAccount(_sender, glp, _amount, _sender);
 
-        IRewardTracker(feeGlpTracker).stakeForAccount(_sender, _recipient, glp, _amount);
-        IRewardTracker(stakedGlpTracker).stakeForAccount(_recipient, _recipient, feeGlpTracker, _amount);
+        IRewardTracker_Original(feeGlpTracker).stakeForAccount(_sender, _recipient, glp, _amount);
+        IRewardTracker_Original(stakedGlpTracker).stakeForAccount(_recipient, _recipient, feeGlpTracker, _amount);
     }
 }

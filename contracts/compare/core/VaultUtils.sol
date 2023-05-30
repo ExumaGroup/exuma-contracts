@@ -9,8 +9,8 @@ import "./interfaces/IVaultUtils.sol";
 
 import "../access/Governable.sol";
 
-contract VaultUtils is IVaultUtils, Governable {
-    using SafeMath for uint256;
+contract VaultUtils_Original is IVaultUtils_Original, Governable_Original {
+    using SafeMath_Original for uint256;
 
     struct Position {
         uint256 size;
@@ -22,12 +22,12 @@ contract VaultUtils is IVaultUtils, Governable {
         uint256 lastIncreasedTime;
     }
 
-    IVault public vault;
+    IVault_Original public vault;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
     uint256 public constant FUNDING_RATE_PRECISION = 1000000;
 
-    constructor(IVault _vault) public {
+    constructor(IVault_Original _vault) public {
         vault = _vault;
     }
 
@@ -44,7 +44,7 @@ contract VaultUtils is IVaultUtils, Governable {
     }
 
     function getPosition(address _account, address _collateralToken, address _indexToken, bool _isLong) internal view returns (Position memory) {
-        IVault _vault = vault;
+        IVault_Original _vault = vault;
         Position memory position;
         {
             (uint256 size, uint256 collateral, uint256 averagePrice, uint256 entryFundingRate, /* reserveAmount */, /* realisedPnl */, /* hasProfit */, uint256 lastIncreasedTime) = _vault.getPosition(_account, _collateralToken, _indexToken, _isLong);
@@ -59,7 +59,7 @@ contract VaultUtils is IVaultUtils, Governable {
 
     function validateLiquidation(address _account, address _collateralToken, address _indexToken, bool _isLong, bool _raise) public view override returns (uint256, uint256) {
         Position memory position = getPosition(_account, _collateralToken, _indexToken, _isLong);
-        IVault _vault = vault;
+        IVault_Original _vault = vault;
 
         (bool hasProfit, uint256 delta) = _vault.getDelta(_indexToken, position.size, position.averagePrice, _isLong, position.lastIncreasedTime);
         uint256 marginFees = getFundingFee(_account, _collateralToken, _indexToken, _isLong, position.size, position.entryFundingRate);

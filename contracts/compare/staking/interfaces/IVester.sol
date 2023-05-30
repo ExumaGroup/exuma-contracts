@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IVester {
+interface IVester_Original {
     function rewardTracker() external view returns (address);
 
     function claimForAccount(address _account, address _receiver) external returns (uint256);

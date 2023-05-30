@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-contract UniPool {
+contract UniPool_Original {
     struct Slot0 {
         // the current price
         uint160 sqrtPriceX96;

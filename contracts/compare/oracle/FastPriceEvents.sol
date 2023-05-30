@@ -7,7 +7,7 @@ import "../access/Governable.sol";
 
 pragma solidity 0.6.12;
 
-contract FastPriceEvents is IFastPriceEvents, Governable {
+contract FastPriceEvents_Original is IFastPriceEvents_Original, Governable_Original {
 
     mapping (address => bool) public isPriceFeed;
     event PriceUpdate(address token, uint256 price, address priceFeed);

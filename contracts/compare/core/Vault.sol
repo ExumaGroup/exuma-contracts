@@ -12,9 +12,9 @@ import "./interfaces/IVault.sol";
 import "./interfaces/IVaultUtils.sol";
 import "./interfaces/IVaultPriceFeed.sol";
 
-contract Vault is ReentrancyGuard, IVault {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract Vault_Original is ReentrancyGuard_Original, IVault_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     struct Position {
         uint256 size;
@@ -40,7 +40,7 @@ contract Vault is ReentrancyGuard, IVault {
     bool public override isSwapEnabled = true;
     bool public override isLeverageEnabled = true;
 
-    IVaultUtils public vaultUtils;
+    IVaultUtils_Original public vaultUtils;
 
     address public errorController;
 
@@ -237,7 +237,7 @@ contract Vault is ReentrancyGuard, IVault {
         stableFundingRateFactor = _stableFundingRateFactor;
     }
 
-    function setVaultUtils(IVaultUtils _vaultUtils) external override {
+    function setVaultUtils(IVaultUtils_Original _vaultUtils) external override {
         _onlyGov();
         vaultUtils = _vaultUtils;
     }
@@ -436,7 +436,7 @@ contract Vault is ReentrancyGuard, IVault {
     // the governance controlling this function should have a timelock
     function upgradeVault(address _newVault, address _token, uint256 _amount) external {
         _onlyGov();
-        IERC20(_token).safeTransfer(_newVault, _amount);
+        IERC20_Original(_token).safeTransfer(_newVault, _amount);
     }
 
     // deposit into the pool without minting USDG tokens
@@ -473,7 +473,7 @@ contract Vault is ReentrancyGuard, IVault {
         _increaseUsdgAmount(_token, mintAmount);
         _increasePoolAmount(_token, amountAfterFees);
 
-        IUSDG(usdg).mint(_receiver, mintAmount);
+        IUSDG_Original(usdg).mint(_receiver, mintAmount);
 
         emit BuyUSDG(_receiver, _token, tokenAmount, mintAmount, feeBasisPoints);
 
@@ -497,7 +497,7 @@ contract Vault is ReentrancyGuard, IVault {
         _decreaseUsdgAmount(_token, usdgAmount);
         _decreasePoolAmount(_token, redemptionAmount);
 
-        IUSDG(usdg).burn(address(this), usdgAmount);
+        IUSDG_Original(usdg).burn(address(this), usdgAmount);
 
         // the _transferIn call increased the value of tokenBalances[usdg]
         // usually decreases in token balances are synced by calling _transferOut
@@ -759,11 +759,11 @@ contract Vault is ReentrancyGuard, IVault {
     }
 
     function getMaxPrice(address _token) public override view returns (uint256) {
-        return IVaultPriceFeed(priceFeed).getPrice(_token, true, includeAmmPrice, useSwapPricing);
+        return IVaultPriceFeed_Original(priceFeed).getPrice(_token, true, includeAmmPrice, useSwapPricing);
     }
 
     function getMinPrice(address _token) public override view returns (uint256) {
-        return IVaultPriceFeed(priceFeed).getPrice(_token, false, includeAmmPrice, useSwapPricing);
+        return IVaultPriceFeed_Original(priceFeed).getPrice(_token, false, includeAmmPrice, useSwapPricing);
     }
 
     function getRedemptionAmount(address _token, uint256 _usdgAmount) public override view returns (uint256) {
@@ -799,15 +799,15 @@ contract Vault is ReentrancyGuard, IVault {
 
     function usdToTokenMax(address _token, uint256 _usdAmount) public view returns (uint256) {
         if (_usdAmount == 0) { return 0; }
-        return usdToToken(_token, _usdAmount, getMinPrice(_token));
+        return usdToToken_Original(_token, _usdAmount, getMinPrice(_token));
     }
 
     function usdToTokenMin(address _token, uint256 _usdAmount) public view returns (uint256) {
         if (_usdAmount == 0) { return 0; }
-        return usdToToken(_token, _usdAmount, getMaxPrice(_token));
+        return usdToToken_Original(_token, _usdAmount, getMaxPrice(_token));
     }
 
-    function usdToToken(address _token, uint256 _usdAmount, uint256 _price) public view returns (uint256) {
+    function usdToToken_Original(address _token, uint256 _usdAmount, uint256 _price) public view returns (uint256) {
         if (_usdAmount == 0) { return 0; }
         uint256 decimals = tokenDecimals[_token];
         return _usdAmount.mul(10 ** decimals).div(_price);
@@ -983,7 +983,7 @@ contract Vault is ReentrancyGuard, IVault {
     }
 
     function getTargetUsdgAmount(address _token) public override view returns (uint256) {
-        uint256 supply = IERC20(usdg).totalSupply();
+        uint256 supply = IERC20_Original(usdg).totalSupply();
         if (supply == 0) { return 0; }
         uint256 weight = tokenWeights[_token];
         return weight.mul(supply).div(totalTokenWeights);
@@ -1114,25 +1114,25 @@ contract Vault is ReentrancyGuard, IVault {
 
     function _transferIn(address _token) private returns (uint256) {
         uint256 prevBalance = tokenBalances[_token];
-        uint256 nextBalance = IERC20(_token).balanceOf(address(this));
+        uint256 nextBalance = IERC20_Original(_token).balanceOf(address(this));
         tokenBalances[_token] = nextBalance;
 
         return nextBalance.sub(prevBalance);
     }
 
     function _transferOut(address _token, uint256 _amount, address _receiver) private {
-        IERC20(_token).safeTransfer(_receiver, _amount);
-        tokenBalances[_token] = IERC20(_token).balanceOf(address(this));
+        IERC20_Original(_token).safeTransfer(_receiver, _amount);
+        tokenBalances[_token] = IERC20_Original(_token).balanceOf(address(this));
     }
 
     function _updateTokenBalance(address _token) private {
-        uint256 nextBalance = IERC20(_token).balanceOf(address(this));
+        uint256 nextBalance = IERC20_Original(_token).balanceOf(address(this));
         tokenBalances[_token] = nextBalance;
     }
 
     function _increasePoolAmount(address _token, uint256 _amount) private {
         poolAmounts[_token] = poolAmounts[_token].add(_amount);
-        uint256 balance = IERC20(_token).balanceOf(address(this));
+        uint256 balance = IERC20_Original(_token).balanceOf(address(this));
         _validate(poolAmounts[_token] <= balance, 49);
         emit IncreasePoolAmount(_token, _amount);
     }

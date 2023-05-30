@@ -8,13 +8,13 @@ import "../libraries/math/SafeMath.sol";
 import "../staking/interfaces/IVester.sol";
 import "../staking/interfaces/IRewardTracker.sol";
 
-contract RewardReader {
-    using SafeMath for uint256;
+contract RewardReader_Original {
+    using SafeMath_Original for uint256;
 
     function getDepositBalances(address _account, address[] memory _depositTokens, address[] memory _rewardTrackers) public view returns (uint256[] memory) {
         uint256[] memory amounts = new uint256[](_rewardTrackers.length);
         for (uint256 i = 0; i < _rewardTrackers.length; i++) {
-            IRewardTracker rewardTracker = IRewardTracker(_rewardTrackers[i]);
+            IRewardTracker_Original rewardTracker = IRewardTracker_Original(_rewardTrackers[i]);
             amounts[i] = rewardTracker.depositBalances(_account, _depositTokens[i]);
         }
         return amounts;
@@ -24,12 +24,12 @@ contract RewardReader {
         uint256 propsLength = 5;
         uint256[] memory amounts = new uint256[](_rewardTrackers.length * propsLength);
         for (uint256 i = 0; i < _rewardTrackers.length; i++) {
-            IRewardTracker rewardTracker = IRewardTracker(_rewardTrackers[i]);
+            IRewardTracker_Original rewardTracker = IRewardTracker_Original(_rewardTrackers[i]);
             amounts[i * propsLength] = rewardTracker.claimable(_account);
             amounts[i * propsLength + 1] = rewardTracker.tokensPerInterval();
             amounts[i * propsLength + 2] = rewardTracker.averageStakedAmounts(_account);
             amounts[i * propsLength + 3] = rewardTracker.cumulativeRewards(_account);
-            amounts[i * propsLength + 4] = IERC20(_rewardTrackers[i]).totalSupply();
+            amounts[i * propsLength + 4] = IERC20_Original(_rewardTrackers[i]).totalSupply();
         }
         return amounts;
     }
@@ -38,11 +38,11 @@ contract RewardReader {
         uint256 propsLength = 12;
         uint256[] memory amounts = new uint256[](_vesters.length * propsLength);
         for (uint256 i = 0; i < _vesters.length; i++) {
-            IVester vester = IVester(_vesters[i]);
-            IRewardTracker rewardTracker = IRewardTracker(vester.rewardTracker());
+            IVester_Original vester = IVester_Original(_vesters[i]);
+            IRewardTracker_Original rewardTracker = IRewardTracker_Original(vester.rewardTracker());
             amounts[i * propsLength] = vester.pairAmounts(_account);
             amounts[i * propsLength + 1] = vester.getVestedAmount(_account);
-            amounts[i * propsLength + 2] = IERC20(_vesters[i]).balanceOf(_account);
+            amounts[i * propsLength + 2] = IERC20_Original(_vesters[i]).balanceOf(_account);
             amounts[i * propsLength + 3] = vester.claimedAmounts(_account);
             amounts[i * propsLength + 4] = vester.claimable(_account);
             amounts[i * propsLength + 5] = vester.getMaxVestableAmount(_account);

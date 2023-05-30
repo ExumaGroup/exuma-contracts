@@ -7,8 +7,8 @@ import "../libraries/token/IERC20.sol";
 import "./interfaces/IGMT.sol";
 import "../peripherals/interfaces/ITimelockTarget.sol";
 
-contract GMT is IERC20, IGMT, ITimelockTarget {
-    using SafeMath for uint256;
+contract GMT_Original is IERC20_Original, IGMT_Original, ITimelockTarget_Original {
+    using SafeMath_Original for uint256;
 
     string public constant name = "Gambit";
     string public constant symbol = "GMT";
@@ -99,8 +99,8 @@ contract GMT is IERC20, IGMT, ITimelockTarget {
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external override onlyGov {
-        IERC20(_token).transfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external override onlyGov {
+        IERC20_Original(_token).transfer(_account, _amount);
     }
 
     function balanceOf(address _account) external view override returns (uint256) {

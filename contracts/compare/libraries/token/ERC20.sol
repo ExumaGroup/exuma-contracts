@@ -7,10 +7,10 @@ import "./IERC20.sol";
 import "../math/SafeMath.sol";
 
 /**
- * @dev Implementation of the {IERC20} interface.
+ * @dev Implementation of the {IERC20_Original} interface.
  *
  * This implementation is agnostic to the way tokens are created. This means
- * that a supply mechanism has to be added in a derived contract using {_mint}.
+ * that a supply mechanism has to be added in a derived contract using_Original {_mint}.
  * For a generic mechanism see {ERC20PresetMinterPauser}.
  *
  * TIP: For a detailed writeup see our guide
@@ -28,10 +28,10 @@ import "../math/SafeMath.sol";
  *
  * Finally, the non-standard {decreaseAllowance} and {increaseAllowance}
  * functions have been added to mitigate the well-known issues around setting
- * allowances. See {IERC20-approve}.
+ * allowances. See {IERC20_Original-approve}.
  */
-contract ERC20 is Context, IERC20 {
-    using SafeMath for uint256;
+contract ERC20_Original is Context_Original, IERC20_Original {
+    using SafeMath_Original for uint256;
 
     mapping (address => uint256) private _balances;
 
@@ -84,28 +84,28 @@ contract ERC20 is Context, IERC20 {
      *
      * NOTE: This information is only used for _display_ purposes: it in
      * no way affects any of the arithmetic of the contract, including
-     * {IERC20-balanceOf} and {IERC20-transfer}.
+     * {IERC20_Original-balanceOf} and {IERC20_Original-transfer}.
      */
     function decimals() public view returns (uint8) {
         return _decimals;
     }
 
     /**
-     * @dev See {IERC20-totalSupply}.
+     * @dev See {IERC20_Original-totalSupply}.
      */
     function totalSupply() public view override returns (uint256) {
         return _totalSupply;
     }
 
     /**
-     * @dev See {IERC20-balanceOf}.
+     * @dev See {IERC20_Original-balanceOf}.
      */
     function balanceOf(address account) public view override returns (uint256) {
         return _balances[account];
     }
 
     /**
-     * @dev See {IERC20-transfer}.
+     * @dev See {IERC20_Original-transfer}.
      *
      * Requirements:
      *
@@ -118,14 +118,14 @@ contract ERC20 is Context, IERC20 {
     }
 
     /**
-     * @dev See {IERC20-allowance}.
+     * @dev See {IERC20_Original-allowance}.
      */
     function allowance(address owner, address spender) public view virtual override returns (uint256) {
         return _allowances[owner][spender];
     }
 
     /**
-     * @dev See {IERC20-approve}.
+     * @dev See {IERC20_Original-approve}.
      *
      * Requirements:
      *
@@ -137,7 +137,7 @@ contract ERC20 is Context, IERC20 {
     }
 
     /**
-     * @dev See {IERC20-transferFrom}.
+     * @dev See {IERC20_Original-transferFrom}.
      *
      * Emits an {Approval} event indicating the updated allowance. This is not
      * required by the EIP. See the note at the beginning of {ERC20}.
@@ -159,7 +159,7 @@ contract ERC20 is Context, IERC20 {
      * @dev Atomically increases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {IERC20-approve}.
+     * problems described in {IERC20_Original-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *
@@ -176,7 +176,7 @@ contract ERC20 is Context, IERC20 {
      * @dev Atomically decreases the allowance granted to `spender` by the caller.
      *
      * This is an alternative to {approve} that can be used as a mitigation for
-     * problems described in {IERC20-approve}.
+     * problems described in {IERC20_Original-approve}.
      *
      * Emits an {Approval} event indicating the updated allowance.
      *

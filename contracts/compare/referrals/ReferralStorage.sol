@@ -9,8 +9,8 @@ import "../peripherals/interfaces/ITimelock.sol";
 
 import "./interfaces/IReferralStorage.sol";
 
-contract ReferralStorage is Governable, IReferralStorage {
-    using SafeMath for uint256;
+contract ReferralStorage_Original is Governable_Original, IReferralStorage_Original {
+    using SafeMath_Original for uint256;
 
     struct Tier {
         uint256 totalRebate; // e.g. 2400 for 24%

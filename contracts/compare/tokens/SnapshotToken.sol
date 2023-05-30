@@ -4,8 +4,8 @@ pragma solidity 0.6.12;
 
 import "./MintableBaseToken.sol";
 
-contract SnapshotToken is MintableBaseToken {
-    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public MintableBaseToken(_name, _symbol, _initialSupply) {
+contract SnapshotToken_Original is MintableBaseToken_Original {
+    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public MintableBaseToken_Original(_name, _symbol, _initialSupply) {
     }
 
     function batchMint(address[] memory _accounts, uint256[] memory _amounts) external onlyMinter {

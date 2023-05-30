@@ -9,8 +9,8 @@ import "../libraries/utils/ReentrancyGuard.sol";
 
 import "../peripherals/interfaces/ITimelock.sol";
 
-contract TokenManager is ReentrancyGuard {
-    using SafeMath for uint256;
+contract TokenManager_Original is ReentrancyGuard_Original {
+    using SafeMath_Original for uint256;
 
     bool public isInitialized;
 
@@ -39,17 +39,17 @@ contract TokenManager is ReentrancyGuard {
     }
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "TokenManager: forbidden");
+        require(msg.sender == admin, "TokenManager_Original: forbidden");
         _;
     }
 
     modifier onlySigner() {
-        require(isSigner[msg.sender], "TokenManager: forbidden");
+        require(isSigner[msg.sender], "TokenManager_Original: forbidden");
         _;
     }
 
     function initialize(address[] memory _signers) public virtual onlyAdmin {
-        require(!isInitialized, "TokenManager: already initialized");
+        require(!isInitialized, "TokenManager_Original: already initialized");
         isInitialized = true;
 
         signers = _signers;
@@ -74,7 +74,7 @@ contract TokenManager is ReentrancyGuard {
     function signApprove(address _token, address _spender, uint256 _amount, uint256 _nonce) external nonReentrant onlySigner {
         bytes32 action = keccak256(abi.encodePacked("approve", _token, _spender, _amount, _nonce));
         _validateAction(action);
-        require(!signedActions[msg.sender][action], "TokenManager: already signed");
+        require(!signedActions[msg.sender][action], "TokenManager_Original: already signed");
         signedActions[msg.sender][action] = true;
         emit SignAction(action, _nonce);
     }
@@ -84,7 +84,7 @@ contract TokenManager is ReentrancyGuard {
         _validateAction(action);
         _validateAuthorization(action);
 
-        IERC20(_token).approve(_spender, _amount);
+        IERC20_Original(_token).approve(_spender, _amount);
         _clearAction(action, _nonce);
     }
 
@@ -99,7 +99,7 @@ contract TokenManager is ReentrancyGuard {
     function signApproveNFT(address _token, address _spender, uint256 _tokenId, uint256 _nonce) external nonReentrant onlySigner {
         bytes32 action = keccak256(abi.encodePacked("approveNFT", _token, _spender, _tokenId, _nonce));
         _validateAction(action);
-        require(!signedActions[msg.sender][action], "TokenManager: already signed");
+        require(!signedActions[msg.sender][action], "TokenManager_Original: already signed");
         signedActions[msg.sender][action] = true;
         emit SignAction(action, _nonce);
     }
@@ -109,7 +109,7 @@ contract TokenManager is ReentrancyGuard {
         _validateAction(action);
         _validateAuthorization(action);
 
-        IERC721(_token).approve(_spender, _tokenId);
+        IERC721_Original(_token).approve(_spender, _tokenId);
         _clearAction(action, _nonce);
     }
 
@@ -124,7 +124,7 @@ contract TokenManager is ReentrancyGuard {
     function signApproveNFTs(address _token, address _spender, uint256[] memory _tokenIds, uint256 _nonce) external nonReentrant onlySigner {
         bytes32 action = keccak256(abi.encodePacked("approveNFTs", _token, _spender, _tokenIds, _nonce));
         _validateAction(action);
-        require(!signedActions[msg.sender][action], "TokenManager: already signed");
+        require(!signedActions[msg.sender][action], "TokenManager_Original: already signed");
         signedActions[msg.sender][action] = true;
         emit SignAction(action, _nonce);
     }
@@ -135,14 +135,14 @@ contract TokenManager is ReentrancyGuard {
         _validateAuthorization(action);
 
         for (uint256 i = 0 ; i < _tokenIds.length; i++) {
-            IERC721(_token).approve(_spender, _tokenIds[i]);
+            IERC721_Original(_token).approve(_spender, _tokenIds[i]);
         }
         _clearAction(action, _nonce);
     }
 
     function receiveNFTs(address _token, address _sender, uint256[] memory _tokenIds) external nonReentrant onlyAdmin {
         for (uint256 i = 0 ; i < _tokenIds.length; i++) {
-            IERC721(_token).transferFrom(_sender, address(this), _tokenIds[i]);
+            IERC721_Original(_token).transferFrom(_sender, address(this), _tokenIds[i]);
         }
     }
 
@@ -158,7 +158,7 @@ contract TokenManager is ReentrancyGuard {
     function signSetAdmin(address _target, address _admin, uint256 _nonce) external nonReentrant onlySigner {
         bytes32 action = keccak256(abi.encodePacked("setAdmin", _target, _admin, _nonce));
         _validateAction(action);
-        require(!signedActions[msg.sender][action], "TokenManager: already signed");
+        require(!signedActions[msg.sender][action], "TokenManager_Original: already signed");
         signedActions[msg.sender][action] = true;
         emit SignAction(action, _nonce);
     }
@@ -168,7 +168,7 @@ contract TokenManager is ReentrancyGuard {
         _validateAction(action);
         _validateAuthorization(action);
 
-        ITimelock(_target).setAdmin(_admin);
+        ITimelock_Original(_target).setAdmin(_admin);
         _clearAction(action, _nonce);
     }
 
@@ -184,7 +184,7 @@ contract TokenManager is ReentrancyGuard {
     function signSetGov(address _timelock, address _target, address _gov, uint256 _nonce) external nonReentrant onlySigner {
         bytes32 action = keccak256(abi.encodePacked("signalSetGov", _timelock, _target, _gov, _nonce));
         _validateAction(action);
-        require(!signedActions[msg.sender][action], "TokenManager: already signed");
+        require(!signedActions[msg.sender][action], "TokenManager_Original: already signed");
         signedActions[msg.sender][action] = true;
         emit SignAction(action, _nonce);
     }
@@ -194,7 +194,7 @@ contract TokenManager is ReentrancyGuard {
         _validateAction(action);
         _validateAuthorization(action);
 
-        ITimelock(_timelock).signalSetGov(_target, _gov);
+        ITimelock_Original(_timelock).signalSetGov(_target, _gov);
         _clearAction(action, _nonce);
     }
 
@@ -204,7 +204,7 @@ contract TokenManager is ReentrancyGuard {
     }
 
     function _validateAction(bytes32 _action) private view {
-        require(pendingActions[_action], "TokenManager: action not signalled");
+        require(pendingActions[_action], "TokenManager_Original: action not signalled");
     }
 
     function _validateAuthorization(bytes32 _action) private view {
@@ -217,13 +217,13 @@ contract TokenManager is ReentrancyGuard {
         }
 
         if (count == 0) {
-            revert("TokenManager: action not authorized");
+            revert("TokenManager_Original: action not authorized");
         }
-        require(count >= minAuthorizations, "TokenManager: insufficient authorization");
+        require(count >= minAuthorizations, "TokenManager_Original: insufficient authorization");
     }
 
     function _clearAction(bytes32 _action, uint256 _nonce) private {
-        require(pendingActions[_action], "TokenManager: invalid _action");
+        require(pendingActions[_action], "TokenManager_Original: invalid _action");
         delete pendingActions[_action];
         emit ClearAction(_action, _nonce);
     }

@@ -10,8 +10,8 @@ import "../amm/interfaces/IPancakePair.sol";
 
 pragma solidity 0.6.12;
 
-contract VaultPriceFeed is IVaultPriceFeed {
-    using SafeMath for uint256;
+contract VaultPriceFeed_Original is IVaultPriceFeed_Original {
+    using SafeMath_Original for uint256;
 
     uint256 public constant PRICE_PRECISION = 10 ** 30;
     uint256 public constant ONE_USD = PRICE_PRECISION;
@@ -276,7 +276,7 @@ contract VaultPriceFeed is IVaultPriceFeed {
         address priceFeedAddress = priceFeeds[_token];
         require(priceFeedAddress != address(0), "VaultPriceFeed: invalid price feed");
 
-        IPriceFeed priceFeed = IPriceFeed(priceFeedAddress);
+        IPriceFeed_Original priceFeed = IPriceFeed_Original(priceFeedAddress);
 
         int256 price = priceFeed.latestAnswer();
         require(price > 0, "VaultPriceFeed: invalid price");
@@ -289,14 +289,14 @@ contract VaultPriceFeed is IVaultPriceFeed {
         require(priceFeedAddress != address(0), "VaultPriceFeed: invalid price feed");
 
         if (chainlinkFlags != address(0)) {
-            bool isRaised = IChainlinkFlags(chainlinkFlags).getFlag(FLAG_ARBITRUM_SEQ_OFFLINE);
+            bool isRaised = IChainlinkFlags_Original(chainlinkFlags).getFlag(FLAG_ARBITRUM_SEQ_OFFLINE);
             if (isRaised) {
                     // If flag is raised we shouldn't perform any critical operations
                 revert("Chainlink feeds are not being updated");
             }
         }
 
-        IPriceFeed priceFeed = IPriceFeed(priceFeedAddress);
+        IPriceFeed_Original priceFeed = IPriceFeed_Original(priceFeedAddress);
 
         uint256 price = 0;
         uint80 roundId = priceFeed.latestRound();
@@ -338,7 +338,7 @@ contract VaultPriceFeed is IVaultPriceFeed {
 
     function getSecondaryPrice(address _token, uint256 _referencePrice, bool _maximise) public view returns (uint256) {
         if (secondaryPriceFeed == address(0)) { return _referencePrice; }
-        return ISecondaryPriceFeed(secondaryPriceFeed).getPrice(_token, _referencePrice, _maximise);
+        return ISecondaryPriceFeed_Original(secondaryPriceFeed).getPrice(_token, _referencePrice, _maximise);
     }
 
     function getAmmPrice(address _token) public override view returns (uint256) {
@@ -369,7 +369,7 @@ contract VaultPriceFeed is IVaultPriceFeed {
     // if divByReserve0: calculate price as reserve1 / reserve0
     // if !divByReserve1: calculate price as reserve0 / reserve1
     function getPairPrice(address _pair, bool _divByReserve0) public view returns (uint256) {
-        (uint256 reserve0, uint256 reserve1, ) = IPancakePair(_pair).getReserves();
+        (uint256 reserve0, uint256 reserve1, ) = IPancakePair_Original(_pair).getReserves();
         if (_divByReserve0) {
             if (reserve0 == 0) { return 0; }
             return reserve1.mul(PRICE_PRECISION).div(reserve0);

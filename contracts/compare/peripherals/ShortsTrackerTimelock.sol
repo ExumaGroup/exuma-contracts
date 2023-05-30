@@ -7,8 +7,8 @@ import "./interfaces/IHandlerTarget.sol";
 
 pragma solidity 0.6.12;
 
-contract ShortsTrackerTimelock {
-    using SafeMath for uint256;
+contract ShortsTrackerTimelock_Original {
+    using SafeMath_Original for uint256;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
     uint256 public constant MAX_BUFFER = 5 days;
@@ -113,7 +113,7 @@ contract ShortsTrackerTimelock {
         _validateAction(action);
         _clearAction(action);
 
-        Governable(_shortsTracker).setGov(_gov);
+        Governable_Original(_shortsTracker).setGov(_gov);
 
         emit SetGov(_shortsTracker, _gov);
     }
@@ -128,7 +128,7 @@ contract ShortsTrackerTimelock {
         bytes32 action = keccak256(abi.encodePacked("setHandler", _target, _handler, _isActive));
         _validateAction(action);
         _clearAction(action);
-        IHandlerTarget(_target).setHandler(_handler, _isActive);
+        IHandlerTarget_Original(_target).setHandler(_handler, _isActive);
     }
 
     function signalSetAveragePriceUpdateDelay(uint256 _averagePriceUpdateDelay) external onlyAdmin {
@@ -165,14 +165,14 @@ contract ShortsTrackerTimelock {
         emit SetMaxAveragePriceChange(_maxAveragePriceChange);
     }
 
-    function signalSetIsGlobalShortDataReady(IShortsTracker _shortsTracker, bool _value) external onlyAdmin {
+    function signalSetIsGlobalShortDataReady(IShortsTracker_Original _shortsTracker, bool _value) external onlyAdmin {
         bytes32 action = keccak256(abi.encodePacked("setIsGlobalShortDataReady", address(_shortsTracker), _value));
         _setPendingAction(action);
 
         emit SignalSetIsGlobalShortDataReady(address(_shortsTracker), _value);
     }
 
-    function setIsGlobalShortDataReady(IShortsTracker _shortsTracker, bool _value) external onlyAdmin {
+    function setIsGlobalShortDataReady(IShortsTracker_Original _shortsTracker, bool _value) external onlyAdmin {
         bytes32 action = keccak256(abi.encodePacked("setIsGlobalShortDataReady", address(_shortsTracker), _value));
         _validateAction(action);
         _clearAction(action);
@@ -182,13 +182,13 @@ contract ShortsTrackerTimelock {
         emit SetIsGlobalShortDataReady(address(_shortsTracker), _value);
     }
 
-    function disableIsGlobalShortDataReady(IShortsTracker _shortsTracker) external onlyAdmin {
+    function disableIsGlobalShortDataReady(IShortsTracker_Original _shortsTracker) external onlyAdmin {
         _shortsTracker.setIsGlobalShortDataReady(false);
 
         emit SetIsGlobalShortDataReady(address(_shortsTracker), false);
     }
 
-    function setGlobalShortAveragePrices(IShortsTracker _shortsTracker, address[] calldata _tokens, uint256[] calldata _averagePrices) external onlyHandler {
+    function setGlobalShortAveragePrices(IShortsTracker_Original _shortsTracker, address[] calldata _tokens, uint256[] calldata _averagePrices) external onlyHandler {
         _shortsTracker.setIsGlobalShortDataReady(false);
 
         for (uint256 i = 0; i < _tokens.length; i++) {

@@ -14,9 +14,9 @@ pragma solidity ^0.6.0;
  * - Entries are enumerated in O(n). No guarantees are made on the ordering.
  *
  * ```
- * contract Example {
+ * contract Example_Original {
  *     // Add the library methods
- *     using EnumerableMap for EnumerableMap.UintToAddressMap;
+ *     using EnumerableMap_Original for EnumerableMap.UintToAddressMap;
  *
  *     // Declare a set state variable
  *     EnumerableMap.UintToAddressMap private myMap;
@@ -26,7 +26,7 @@ pragma solidity ^0.6.0;
  * As of v3.0.0, only maps of type `uint256 -> address` (`UintToAddressMap`) are
  * supported.
  */
-library EnumerableMap {
+library EnumerableMap_Original {
     // To implement this library for multiple types with as little code
     // repetition as possible, we write it in terms of a generic Map type with
     // bytes32 keys and values.

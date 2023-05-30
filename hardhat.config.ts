@@ -48,7 +48,7 @@ const config = {
 	contractSizer:
 	{
 		runOnCompile: true,
-		except: ["contracts/mocks/*"]
+		except: ["contracts/mocks", "contracts/compare", "hardhat/console"]
 	},
 	docgen: {
 		pages: pa, // "files",
@@ -62,7 +62,8 @@ const config = {
 		currency: "EUR",
 		excludeContracts:
 			[
-				"contracts/mocks/"
+				"contracts/**/*.mock.sol",
+				"contracts/compare"
 			]
 	},
 	networks: {
@@ -70,6 +71,9 @@ const config = {
 			url: `https://eth-goerli.g.alchemy.com/v2/${process.env.ALCHEMY_API_KEY}`,
 			accounts
 		}
+	},
+	paths: {
+		tests: "./tests" // default="./test"
 	},
 	solidity: {
 		compilers: [

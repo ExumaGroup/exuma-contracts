@@ -6,8 +6,8 @@ import "../libraries/math/SafeMath.sol";
 
 import "../core/interfaces/IOrderBook.sol";
 
-contract OrderBookReader {
-    using SafeMath for uint256;
+contract OrderBookReader_Original {
+    using SafeMath_Original for uint256;
 
     struct Vars {
         uint256 i;
@@ -27,7 +27,7 @@ contract OrderBookReader {
         uint256[] memory uintProps = new uint256[](vars.uintLength * _indices.length);
         address[] memory addressProps = new address[](vars.addressLength * _indices.length);
 
-        IOrderBook orderBook = IOrderBook(_orderBookAddress);
+        IOrderBook_Original orderBook = IOrderBook_Original(_orderBookAddress);
 
         while (vars.i < _indices.length) {
             vars.index = _indices[vars.i];
@@ -69,7 +69,7 @@ contract OrderBookReader {
         uint256[] memory uintProps = new uint256[](vars.uintLength * _indices.length);
         address[] memory addressProps = new address[](vars.addressLength * _indices.length);
 
-        IOrderBook orderBook = IOrderBook(_orderBookAddress);
+        IOrderBook_Original orderBook = IOrderBook_Original(_orderBookAddress);
 
         while (vars.i < _indices.length) {
             vars.index = _indices[vars.i];
@@ -109,7 +109,7 @@ contract OrderBookReader {
         uint256[] memory uintProps = new uint256[](vars.uintLength * _indices.length);
         address[] memory addressProps = new address[](vars.addressLength * _indices.length);
 
-        IOrderBook orderBook = IOrderBook(_orderBookAddress);
+        IOrderBook_Original orderBook = IOrderBook_Original(_orderBookAddress);
 
         while (vars.i < _indices.length) {
             vars.index = _indices[vars.i];

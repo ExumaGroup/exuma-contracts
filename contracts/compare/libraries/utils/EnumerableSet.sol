@@ -14,9 +14,9 @@ pragma solidity ^0.6.0;
  * - Elements are enumerated in O(n). No guarantees are made on the ordering.
  *
  * ```
- * contract Example {
+ * contract Example_Original {
  *     // Add the library methods
- *     using EnumerableSet for EnumerableSet.AddressSet;
+ *     using EnumerableSet_Original for EnumerableSet.AddressSet;
  *
  *     // Declare a set state variable
  *     EnumerableSet.AddressSet private mySet;
@@ -26,7 +26,7 @@ pragma solidity ^0.6.0;
  * As of v3.0.0, only sets of type `address` (`AddressSet`) and `uint256`
  * (`UintSet`) are supported.
  */
-library EnumerableSet {
+library EnumerableSet_Original {
     // To implement this library for multiple types with as little code
     // repetition as possible, we write it in terms of a generic Set type with
     // bytes32 values.

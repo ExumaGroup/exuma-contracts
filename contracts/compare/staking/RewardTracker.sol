@@ -11,9 +11,9 @@ import "./interfaces/IRewardDistributor.sol";
 import "./interfaces/IRewardTracker.sol";
 import "../access/Governable.sol";
 
-contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract RewardTracker_Original is IERC20_Original, ReentrancyGuard_Original, IRewardTracker_Original, Governable_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
     uint256 public constant PRECISION = 1e30;
@@ -68,7 +68,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         distributor = _distributor;
     }
 
-    function setDepositToken(address _depositToken, bool _isDepositToken) external onlyGov {
+    function setDepositToken_Original(address _depositToken, bool _isDepositToken) external onlyGov {
         isDepositToken[_depositToken] = _isDepositToken;
     }
 
@@ -89,8 +89,8 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external onlyGov {
-        IERC20(_token).safeTransfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external onlyGov {
+        IERC20_Original(_token).safeTransfer(_account, _amount);
     }
 
     function balanceOf(address _account) external view override returns (uint256) {
@@ -144,7 +144,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
     }
 
     function tokensPerInterval() external override view returns (uint256) {
-        return IRewardDistributor(distributor).tokensPerInterval();
+        return IRewardDistributor_Original(distributor).tokensPerInterval();
     }
 
     function updateRewards() external override nonReentrant {
@@ -167,14 +167,14 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
             return claimableReward[_account];
         }
         uint256 supply = totalSupply;
-        uint256 pendingRewards = IRewardDistributor(distributor).pendingRewards().mul(PRECISION);
+        uint256 pendingRewards = IRewardDistributor_Original(distributor).pendingRewards().mul(PRECISION);
         uint256 nextCumulativeRewardPerToken = cumulativeRewardPerToken.add(pendingRewards.div(supply));
         return claimableReward[_account].add(
             stakedAmount.mul(nextCumulativeRewardPerToken.sub(previousCumulatedRewardPerToken[_account])).div(PRECISION));
     }
 
-    function rewardToken() public view returns (address) {
-        return IRewardDistributor(distributor).rewardToken();
+    function rewardToken_Original() public view returns (address) {
+        return IRewardDistributor_Original(distributor).rewardToken();
     }
 
     function _claim(address _account, address _receiver) private returns (uint256) {
@@ -184,7 +184,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         claimableReward[_account] = 0;
 
         if (tokenAmount > 0) {
-            IERC20(rewardToken()).safeTransfer(_receiver, tokenAmount);
+            IERC20_Original(rewardToken_Original()).safeTransfer(_receiver, tokenAmount);
             emit Claim(_account, tokenAmount);
         }
 
@@ -238,7 +238,7 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         require(_amount > 0, "RewardTracker: invalid _amount");
         require(isDepositToken[_depositToken], "RewardTracker: invalid _depositToken");
 
-        IERC20(_depositToken).safeTransferFrom(_fundingAccount, address(this), _amount);
+        IERC20_Original(_depositToken).safeTransferFrom(_fundingAccount, address(this), _amount);
 
         _updateRewards(_account);
 
@@ -266,11 +266,11 @@ contract RewardTracker is IERC20, ReentrancyGuard, IRewardTracker, Governable {
         totalDepositSupply[_depositToken] = totalDepositSupply[_depositToken].sub(_amount);
 
         _burn(_account, _amount);
-        IERC20(_depositToken).safeTransfer(_receiver, _amount);
+        IERC20_Original(_depositToken).safeTransfer(_receiver, _amount);
     }
 
     function _updateRewards(address _account) private {
-        uint256 blockReward = IRewardDistributor(distributor).distribute();
+        uint256 blockReward = IRewardDistributor_Original(distributor).distribute();
 
         uint256 supply = totalSupply;
         uint256 _cumulativeRewardPerToken = cumulativeRewardPerToken;

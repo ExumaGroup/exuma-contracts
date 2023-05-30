@@ -5,15 +5,15 @@ pragma solidity 0.6.12;
 import "./BaseToken.sol";
 import "./interfaces/IMintable.sol";
 
-contract MintableBaseToken is BaseToken, IMintable {
+contract MintableBaseToken_Original is BaseToken_Original, IMintable_Original {
 
     mapping (address => bool) public override isMinter;
 
-    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public BaseToken(_name, _symbol, _initialSupply) {
+    constructor(string memory _name, string memory _symbol, uint256 _initialSupply) public BaseToken_Original(_name, _symbol, _initialSupply) {
     }
 
     modifier onlyMinter() {
-        require(isMinter[msg.sender], "MintableBaseToken: forbidden");
+        require(isMinter[msg.sender], "MintableBaseToken_Original: forbidden");
         _;
     }
 

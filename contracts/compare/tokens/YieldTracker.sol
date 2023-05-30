@@ -12,9 +12,9 @@ import "./interfaces/IYieldTracker.sol";
 import "./interfaces/IYieldToken.sol";
 
 // code adapated from https://github.com/trusttoken/smart-contracts/blob/master/contracts/truefi/TrueFarm.sol
-contract YieldTracker is IYieldTracker, ReentrancyGuard {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract YieldTracker_Original is IYieldTracker_Original, ReentrancyGuard_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     uint256 public constant PRECISION = 1e30;
 
@@ -47,8 +47,8 @@ contract YieldTracker is IYieldTracker, ReentrancyGuard {
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external onlyGov {
-        IERC20(_token).safeTransfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external onlyGov {
+        IERC20_Original(_token).safeTransfer(_account, _amount);
     }
 
     function claim(address _account, address _receiver) external override returns (uint256) {
@@ -58,24 +58,24 @@ contract YieldTracker is IYieldTracker, ReentrancyGuard {
         uint256 tokenAmount = claimableReward[_account];
         claimableReward[_account] = 0;
 
-        address rewardToken = IDistributor(distributor).getRewardToken(address(this));
-        IERC20(rewardToken).safeTransfer(_receiver, tokenAmount);
+        address rewardToken = IDistributor_Original(distributor).getRewardToken_Original(address(this));
+        IERC20_Original(rewardToken).safeTransfer(_receiver, tokenAmount);
         emit Claim(_account, tokenAmount);
 
         return tokenAmount;
     }
 
     function getTokensPerInterval() external override view returns (uint256) {
-        return IDistributor(distributor).tokensPerInterval(address(this));
+        return IDistributor_Original(distributor).tokensPerInterval(address(this));
     }
 
     function claimable(address _account) external override view returns (uint256) {
-        uint256 stakedBalance = IYieldToken(yieldToken).stakedBalance(_account);
+        uint256 stakedBalance = IYieldToken_Original(yieldToken).stakedBalance(_account);
         if (stakedBalance == 0) {
             return claimableReward[_account];
         }
-        uint256 pendingRewards = IDistributor(distributor).getDistributionAmount(address(this)).mul(PRECISION);
-        uint256 totalStaked = IYieldToken(yieldToken).totalStaked();
+        uint256 pendingRewards = IDistributor_Original(distributor).getDistributionAmount(address(this)).mul(PRECISION);
+        uint256 totalStaked = IYieldToken_Original(yieldToken).totalStaked();
         uint256 nextCumulativeRewardPerToken = cumulativeRewardPerToken.add(pendingRewards.div(totalStaked));
         return claimableReward[_account].add(
             stakedBalance.mul(nextCumulativeRewardPerToken.sub(previousCumulatedRewardPerToken[_account])).div(PRECISION));
@@ -85,11 +85,11 @@ contract YieldTracker is IYieldTracker, ReentrancyGuard {
         uint256 blockReward;
 
         if (distributor != address(0)) {
-            blockReward = IDistributor(distributor).distribute();
+            blockReward = IDistributor_Original(distributor).distribute();
         }
 
         uint256 _cumulativeRewardPerToken = cumulativeRewardPerToken;
-        uint256 totalStaked = IYieldToken(yieldToken).totalStaked();
+        uint256 totalStaked = IYieldToken_Original(yieldToken).totalStaked();
         // only update cumulativeRewardPerToken when there are stakers, i.e. when totalStaked > 0
         // if blockReward == 0, then there will be no change to cumulativeRewardPerToken
         if (totalStaked > 0 && blockReward > 0) {
@@ -104,7 +104,7 @@ contract YieldTracker is IYieldTracker, ReentrancyGuard {
         }
 
         if (_account != address(0)) {
-            uint256 stakedBalance = IYieldToken(yieldToken).stakedBalance(_account);
+            uint256 stakedBalance = IYieldToken_Original(yieldToken).stakedBalance(_account);
             uint256 _previousCumulatedReward = previousCumulatedRewardPerToken[_account];
             uint256 _claimableReward = claimableReward[_account].add(
                 stakedBalance.mul(_cumulativeRewardPerToken.sub(_previousCumulatedReward)).div(PRECISION)

@@ -14,9 +14,9 @@ import "../access/Governable.sol";
 
 pragma solidity 0.6.12;
 
-contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract GlpManager_Original is ReentrancyGuard_Original, Governable_Original, IGlpManager_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     uint256 public constant PRICE_PRECISION = 10 ** 30;
     uint256 public constant USDG_DECIMALS = 18;
@@ -24,8 +24,8 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
     uint256 public constant MAX_COOLDOWN_DURATION = 48 hours;
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
 
-    IVault public override vault;
-    IShortsTracker public shortsTracker;
+    IVault_Original public override vault;
+    IShortsTracker_Original public shortsTracker;
     address public override usdg;
     address public override glp;
 
@@ -61,10 +61,10 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
 
     constructor(address _vault, address _usdg, address _glp, address _shortsTracker, uint256 _cooldownDuration) public {
         gov = msg.sender;
-        vault = IVault(_vault);
+        vault = IVault_Original(_vault);
         usdg = _usdg;
         glp = _glp;
-        shortsTracker = IShortsTracker(_shortsTracker);
+        shortsTracker = IShortsTracker_Original(_shortsTracker);
         cooldownDuration = _cooldownDuration;
     }
 
@@ -72,7 +72,7 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
         inPrivateMode = _inPrivateMode;
     }
 
-    function setShortsTracker(IShortsTracker _shortsTracker) external onlyGov {
+    function setShortsTracker_Original(IShortsTracker_Original _shortsTracker) external onlyGov {
         shortsTracker = _shortsTracker;
     }
 
@@ -117,7 +117,7 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
 
     function getPrice(bool _maximise) external view returns (uint256) {
         uint256 aum = getAum(_maximise);
-        uint256 supply = IERC20(glp).totalSupply();
+        uint256 supply = IERC20_Original(glp).totalSupply();
         return aum.mul(GLP_PRECISION).div(supply);
     }
 
@@ -137,7 +137,7 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
         uint256 length = vault.allWhitelistedTokensLength();
         uint256 aum = aumAddition;
         uint256 shortProfits = 0;
-        IVault _vault = vault;
+        IVault_Original _vault = vault;
 
         for (uint256 i = 0; i < length; i++) {
             address token = vault.allWhitelistedTokens(i);
@@ -186,7 +186,7 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
     }
 
     function getGlobalShortAveragePrice(address _token) public view returns (uint256) {
-        IShortsTracker _shortsTracker = shortsTracker;
+        IShortsTracker_Original _shortsTracker = shortsTracker;
         if (address(_shortsTracker) == address(0) || !_shortsTracker.isGlobalShortDataReady()) {
             return vault.globalShortAveragePrices(_token);
         }
@@ -211,16 +211,16 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
 
         // calculate aum before buyUSDG
         uint256 aumInUsdg = getAumInUsdg(true);
-        uint256 glpSupply = IERC20(glp).totalSupply();
+        uint256 glpSupply = IERC20_Original(glp).totalSupply();
 
-        IERC20(_token).safeTransferFrom(_fundingAccount, address(vault), _amount);
+        IERC20_Original(_token).safeTransferFrom(_fundingAccount, address(vault), _amount);
         uint256 usdgAmount = vault.buyUSDG(_token, address(this));
         require(usdgAmount >= _minUsdg, "GlpManager: insufficient USDG output");
 
         uint256 mintAmount = aumInUsdg == 0 ? usdgAmount : usdgAmount.mul(glpSupply).div(aumInUsdg);
         require(mintAmount >= _minGlp, "GlpManager: insufficient GLP output");
 
-        IMintable(glp).mint(_account, mintAmount);
+        IMintable_Original(glp).mint(_account, mintAmount);
 
         lastAddedAt[_account] = block.timestamp;
 
@@ -235,17 +235,17 @@ contract GlpManager is ReentrancyGuard, Governable, IGlpManager {
 
         // calculate aum before sellUSDG
         uint256 aumInUsdg = getAumInUsdg(false);
-        uint256 glpSupply = IERC20(glp).totalSupply();
+        uint256 glpSupply = IERC20_Original(glp).totalSupply();
 
         uint256 usdgAmount = _glpAmount.mul(aumInUsdg).div(glpSupply);
-        uint256 usdgBalance = IERC20(usdg).balanceOf(address(this));
+        uint256 usdgBalance = IERC20_Original(usdg).balanceOf(address(this));
         if (usdgAmount > usdgBalance) {
-            IUSDG(usdg).mint(address(this), usdgAmount.sub(usdgBalance));
+            IUSDG_Original(usdg).mint(address(this), usdgAmount.sub(usdgBalance));
         }
 
-        IMintable(glp).burn(_account, _glpAmount);
+        IMintable_Original(glp).burn(_account, _glpAmount);
 
-        IERC20(usdg).transfer(address(vault), usdgAmount);
+        IERC20_Original(usdg).transfer(address(vault), usdgAmount);
         uint256 amountOut = vault.sellUSDG(_tokenOut, _receiver);
         require(amountOut >= _minOut, "GlpManager: insufficient output");
 

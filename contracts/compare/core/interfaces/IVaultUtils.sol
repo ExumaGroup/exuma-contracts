@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IVaultUtils {
+interface IVaultUtils_Original {
     function updateCumulativeFundingRate(address _collateralToken, address _indexToken) external returns (bool);
     function validateIncreasePosition(address _account, address _collateralToken, address _indexToken, uint256 _sizeDelta, bool _isLong) external view;
     function validateDecreasePosition(address _account, address _collateralToken, address _indexToken, uint256 _collateralDelta, uint256 _sizeDelta, bool _isLong, address _receiver) external view;

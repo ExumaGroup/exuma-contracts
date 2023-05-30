@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IVaultPriceFeed {
+interface IVaultPriceFeed_Original {
     function adjustmentBasisPoints(address _token) external view returns (uint256);
     function isAdjustmentAdditive(address _token) external view returns (bool);
     function setAdjustment(address _token, bool _isAdditive, uint256 _adjustmentBps) external;

@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IBasePositionManager {
+interface IBasePositionManager_Original {
     function maxGlobalLongSizes(address _token) external view returns (uint256);
     function maxGlobalShortSizes(address _token) external view returns (uint256);
 }

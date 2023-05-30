@@ -8,14 +8,14 @@ import "../access/Governable.sol";
 import "./interfaces/IShortsTracker.sol";
 import "./interfaces/IVault.sol";
 
-contract ShortsTracker is Governable, IShortsTracker {
-    using SafeMath for uint256;
+contract ShortsTracker_Original is Governable_Original, IShortsTracker_Original {
+    using SafeMath_Original for uint256;
 
     event GlobalShortDataUpdated(address indexed token, uint256 globalShortSize, uint256 globalShortAveragePrice);
 
     uint256 public constant MAX_INT256 = uint256(type(int256).max);
 
-    IVault public vault;
+    IVault_Original public vault;
 
     mapping (address => bool) public isHandler;
     mapping (bytes32 => bytes32) public data;
@@ -24,16 +24,16 @@ contract ShortsTracker is Governable, IShortsTracker {
     bool override public isGlobalShortDataReady;
 
     modifier onlyHandler() {
-        require(isHandler[msg.sender], "ShortsTracker: forbidden");
+        require(isHandler[msg.sender], "ShortsTracker_Original: forbidden");
         _;
     }
 
     constructor(address _vault) public {
-        vault = IVault(_vault);
+        vault = IVault_Original(_vault);
     }
 
     function setHandler(address _handler, bool _isActive) external onlyGov {
-        require(_handler != address(0), "ShortsTracker: invalid _handler");
+        require(_handler != address(0), "ShortsTracker_Original: invalid _handler");
         isHandler[_handler] = _isActive;
     }
 
@@ -80,7 +80,7 @@ contract ShortsTracker is Governable, IShortsTracker {
         uint256 averagePrice = globalShortAveragePrices[_token];
         if (size == 0) { return (false, 0); }
 
-        uint256 nextPrice = IVault(vault).getMaxPrice(_token);
+        uint256 nextPrice = IVault_Original(vault).getMaxPrice(_token);
         uint256 priceDelta = averagePrice > nextPrice ? averagePrice.sub(nextPrice) : nextPrice.sub(averagePrice);
         uint256 delta = size.mul(priceDelta).div(averagePrice);
         bool hasProfit = averagePrice > nextPrice;
@@ -90,7 +90,7 @@ contract ShortsTracker is Governable, IShortsTracker {
 
 
     function setInitData(address[] calldata _tokens, uint256[] calldata _averagePrices) override external onlyGov {
-        require(!isGlobalShortDataReady, "ShortsTracker: already migrated");
+        require(!isGlobalShortDataReady, "ShortsTracker_Original: already migrated");
 
         for (uint256 i = 0; i < _tokens.length; i++) {
             globalShortAveragePrices[_tokens[i]] = _averagePrices[i];
@@ -150,13 +150,13 @@ contract ShortsTracker is Governable, IShortsTracker {
             return 0;
         }
 
-        IVault _vault = vault;
+        IVault_Original _vault = vault;
         (uint256 size, /*uint256 collateral*/, uint256 averagePrice, , , , , uint256 lastIncreasedTime) = _vault.getPosition(_account, _collateralToken, _indexToken, false);
 
         (bool hasProfit, uint256 delta) = _vault.getDelta(_indexToken, size, averagePrice, false, lastIncreasedTime);
         // get the proportional change in pnl
         uint256 adjustedDelta = _sizeDelta.mul(delta).div(size);
-        require(adjustedDelta < MAX_INT256, "ShortsTracker: overflow");
+        require(adjustedDelta < MAX_INT256, "ShortsTracker_Original: overflow");
         return hasProfit ? int256(adjustedDelta) : -int256(adjustedDelta);
     }
 

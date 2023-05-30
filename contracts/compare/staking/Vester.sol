@@ -12,9 +12,9 @@ import "./interfaces/IVester.sol";
 import "../tokens/interfaces/IMintable.sol";
 import "../access/Governable.sol";
 
-contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract Vester_Original is IVester_Original, IERC20_Original, ReentrancyGuard_Original, Governable_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     string public name;
     string public symbol;
@@ -103,8 +103,8 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external onlyGov {
-        IERC20(_token).safeTransfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external onlyGov {
+        IERC20_Original(_token).safeTransfer(_account, _amount);
     }
 
     function withdraw() external nonReentrant {
@@ -117,13 +117,13 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
         uint256 totalVested = balance.add(claimedAmount);
         require(totalVested > 0, "Vester: vested amount is zero");
 
-        if (hasPairToken()) {
+        if (hasPairToken_Original()) {
             uint256 pairAmount = pairAmounts[account];
             _burnPair(account, pairAmount);
-            IERC20(pairToken).safeTransfer(_receiver, pairAmount);
+            IERC20_Original(pairToken).safeTransfer(_receiver, pairAmount);
         }
 
-        IERC20(esToken).safeTransfer(_receiver, balance);
+        IERC20_Original(esToken).safeTransfer(_receiver, balance);
         _burn(account, balance);
 
         delete cumulativeClaimAmounts[account];
@@ -140,7 +140,7 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
         transferredAverageStakedAmounts[_sender] = 0;
 
         uint256 transferredCumulativeReward = transferredCumulativeRewards[_sender];
-        uint256 cumulativeReward = IRewardTracker(rewardTracker).cumulativeRewards(_sender);
+        uint256 cumulativeReward = IRewardTracker_Original(rewardTracker).cumulativeRewards(_sender);
 
         transferredCumulativeRewards[_receiver] = transferredCumulativeReward.add(cumulativeReward);
         cumulativeRewardDeductions[_sender] = cumulativeReward;
@@ -181,7 +181,7 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
 
         uint256 transferredCumulativeReward = transferredCumulativeRewards[_account];
         uint256 bonusReward = bonusRewards[_account];
-        uint256 cumulativeReward = IRewardTracker(rewardTracker).cumulativeRewards(_account);
+        uint256 cumulativeReward = IRewardTracker_Original(rewardTracker).cumulativeRewards(_account);
         uint256 maxVestableAmount = cumulativeReward.add(transferredCumulativeReward).add(bonusReward);
 
         uint256 cumulativeRewardDeduction = cumulativeRewardDeductions[_account];
@@ -194,12 +194,12 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
     }
 
     function getCombinedAverageStakedAmount(address _account) public override view returns (uint256) {
-        uint256 cumulativeReward = IRewardTracker(rewardTracker).cumulativeRewards(_account);
+        uint256 cumulativeReward = IRewardTracker_Original(rewardTracker).cumulativeRewards(_account);
         uint256 transferredCumulativeReward = transferredCumulativeRewards[_account];
         uint256 totalCumulativeReward = cumulativeReward.add(transferredCumulativeReward);
         if (totalCumulativeReward == 0) { return 0; }
 
-        uint256 averageStakedAmount = IRewardTracker(rewardTracker).averageStakedAmounts(_account);
+        uint256 averageStakedAmount = IRewardTracker_Original(rewardTracker).averageStakedAmounts(_account);
         uint256 transferredAverageStakedAmount = transferredAverageStakedAmounts[_account];
 
         return averageStakedAmount
@@ -230,7 +230,7 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
         return rewardTracker != address(0);
     }
 
-    function hasPairToken() public view returns (bool) {
+    function hasPairToken_Original() public view returns (bool) {
         return pairToken != address(0);
     }
 
@@ -309,16 +309,16 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
 
         _updateVesting(_account);
 
-        IERC20(esToken).safeTransferFrom(_account, address(this), _amount);
+        IERC20_Original(esToken).safeTransferFrom(_account, address(this), _amount);
 
         _mint(_account, _amount);
 
-        if (hasPairToken()) {
+        if (hasPairToken_Original()) {
             uint256 pairAmount = pairAmounts[_account];
             uint256 nextPairAmount = getPairAmount(_account, balances[_account]);
             if (nextPairAmount > pairAmount) {
                 uint256 pairAmountDiff = nextPairAmount.sub(pairAmount);
-                IERC20(pairToken).safeTransferFrom(_account, address(this), pairAmountDiff);
+                IERC20_Original(pairToken).safeTransferFrom(_account, address(this), pairAmountDiff);
                 _mintPair(_account, pairAmountDiff);
             }
         }
@@ -343,7 +343,7 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
         _burn(_account, amount);
         cumulativeClaimAmounts[_account] = cumulativeClaimAmounts[_account].add(amount);
 
-        IMintable(esToken).burn(address(this), amount);
+        IMintable_Original(esToken).burn(address(this), amount);
     }
 
     function _getNextClaimableAmount(address _account) private view returns (uint256) {
@@ -366,7 +366,7 @@ contract Vester is IVester, IERC20, ReentrancyGuard, Governable {
         _updateVesting(_account);
         uint256 amount = claimable(_account);
         claimedAmounts[_account] = claimedAmounts[_account].add(amount);
-        IERC20(claimableToken).safeTransfer(_receiver, amount);
+        IERC20_Original(claimableToken).safeTransfer(_receiver, amount);
         emit Claim(_account, amount);
         return amount;
     }

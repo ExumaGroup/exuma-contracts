@@ -3,7 +3,7 @@
 pragma solidity 0.6.12;
 pragma experimental ABIEncoderV2;
 
-contract UniNftManager {
+contract UniNftManager_Original {
     struct CollectParams {
         uint256 tokenId;
         address recipient;

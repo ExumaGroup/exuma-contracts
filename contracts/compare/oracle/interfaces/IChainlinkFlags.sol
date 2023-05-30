@@ -2,6 +2,6 @@
 
 pragma solidity 0.6.12;
 
-interface IChainlinkFlags {
+interface IChainlinkFlags_Original {
   function getFlag(address) external view returns (bool);
 }

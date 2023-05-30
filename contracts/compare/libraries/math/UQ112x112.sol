@@ -7,7 +7,7 @@ pragma solidity 0.6.12;
 // range: [0, 2**112 - 1]
 // resolution: 1 / 2**112
 
-library UQ112x112 {
+library UQ112x112_Original {
     uint224 constant Q112 = 2**112;
 
     // encode a uint112 as a UQ112x112

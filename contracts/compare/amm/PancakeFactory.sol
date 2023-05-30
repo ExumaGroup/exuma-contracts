@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 
 import "./interfaces/IPancakeFactory.sol";
 
-contract PancakeFactory is IPancakeFactory {
+contract PancakeFactory_Original is IPancakeFactory_Original {
     address public btc;
     address public bnb;
     address public busd;

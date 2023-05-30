@@ -8,8 +8,8 @@ import "../libraries/math/SafeMath.sol";
 import "../staking/interfaces/IVester.sol";
 import "../staking/interfaces/IRewardTracker.sol";
 
-contract EsGmxBatchSender {
-    using SafeMath for uint256;
+contract EsGmxBatchSender_Original {
+    using SafeMath_Original for uint256;
 
     address public admin;
     address public esGmx;
@@ -25,15 +25,15 @@ contract EsGmxBatchSender {
     }
 
     function send(
-        IVester _vester,
+        IVester_Original _vester,
         uint256 _minRatio,
         address[] memory _accounts,
         uint256[] memory _amounts
     ) external onlyAdmin {
-        IRewardTracker rewardTracker = IRewardTracker(_vester.rewardTracker());
+        IRewardTracker_Original rewardTracker = IRewardTracker_Original(_vester.rewardTracker());
 
         for (uint256 i = 0; i < _accounts.length; i++) {
-            IERC20(esGmx).transferFrom(msg.sender, _accounts[i], _amounts[i]);
+            IERC20_Original(esGmx).transferFrom(msg.sender, _accounts[i], _amounts[i]);
 
             uint256 nextTransferredCumulativeReward = _vester.transferredCumulativeRewards(_accounts[i]).add(_amounts[i]);
             _vester.setTransferredCumulativeRewards(_accounts[i], nextTransferredCumulativeReward);

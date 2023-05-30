@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IPancakeRouter {
+interface IPancakeRouter_Original {
     function addLiquidity(
         address tokenA,
         address tokenB,

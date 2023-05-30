@@ -2,6 +2,6 @@
 
 pragma solidity 0.6.12;
 
-interface IFastPriceEvents {
+interface IFastPriceEvents_Original {
     function emitPriceEvent(address _token, uint256 _price) external;
 }

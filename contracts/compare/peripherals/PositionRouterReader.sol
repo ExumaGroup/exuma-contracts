@@ -4,12 +4,12 @@ pragma solidity 0.6.12;
 
 import "../core/PositionRouter.sol";
 
-contract PositionRouterReader {
+contract PositionRouterReader_Original {
     function getTransferTokenOfIncreasePositionRequests(
         address _positionRouter,
         uint256 _endIndex
     ) external view returns (uint256[] memory, address[] memory) {
-        IPositionRouter positionRouter = IPositionRouter(_positionRouter);
+        IPositionRouter_Original positionRouter = IPositionRouter_Original(_positionRouter);
 
         // increasePositionRequestKeysStart,
         // increasePositionRequestKeys.length,

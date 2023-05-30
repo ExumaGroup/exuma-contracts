@@ -7,8 +7,8 @@ import "../libraries/math/SafeMath.sol";
 
 import "./interfaces/IGmxIou.sol";
 
-contract GmxIou is IERC20, IGmxIou {
-    using SafeMath for uint256;
+contract GmxIou_Original is IERC20_Original, IGmxIou_Original {
+    using SafeMath_Original for uint256;
 
     mapping (address => uint256) private _balances;
     uint256 public override totalSupply;

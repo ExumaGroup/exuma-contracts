@@ -4,8 +4,8 @@ import "../ShortsTracker.sol";
 
 pragma solidity 0.6.12;
 
-contract ShortsTrackerTest is ShortsTracker {
-    constructor(address _vault) public ShortsTracker(_vault) {}
+contract ShortsTrackerTest_Original is ShortsTracker_Original {
+    constructor(address _vault) public ShortsTracker_Original(_vault) {}
 
     function getNextGlobalShortDataWithRealisedPnl(
        address _indexToken,

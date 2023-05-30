@@ -19,8 +19,8 @@ import "../staking/interfaces/IVester.sol";
 import "../libraries/math/SafeMath.sol";
 import "../libraries/token/IERC20.sol";
 
-contract GmxTimelock is IGmxTimelock {
-    using SafeMath for uint256;
+contract GmxTimelock_Original is IGmxTimelock_Original {
+    using SafeMath_Original for uint256;
 
     uint256 public constant PRICE_PRECISION = 10 ** 30;
     uint256 public constant MAX_BUFFER = 7 days;
@@ -44,7 +44,7 @@ contract GmxTimelock is IGmxTimelock {
 
     event SignalPendingAction(bytes32 action);
     event SignalApprove(address token, address spender, uint256 amount, bytes32 action);
-    event SignalWithdrawToken(address target, address token, address receiver, uint256 amount, bytes32 action);
+    event SignalWithdrawToken_Original(address target, address token, address receiver, uint256 amount, bytes32 action);
     event SignalMint(address token, address receiver, uint256 amount, bytes32 action);
     event SignalSetGov(address target, address gov, bytes32 action);
     event SignalSetPriceFeed(address vault, address priceFeed, bytes32 action);
@@ -79,7 +79,7 @@ contract GmxTimelock is IGmxTimelock {
         _;
     }
 
-    modifier onlyTokenManager() {
+    modifier onlyTokenManager_Original() {
         require(msg.sender == tokenManager, "GmxTimelock: forbidden");
         _;
     }
@@ -109,13 +109,13 @@ contract GmxTimelock is IGmxTimelock {
         maxTokenSupply = _maxTokenSupply;
     }
 
-    function setAdmin(address _admin) external override onlyTokenManager {
+    function setAdmin(address _admin) external override onlyTokenManager_Original {
         admin = _admin;
     }
 
     function setExternalAdmin(address _target, address _admin) external onlyAdmin {
         require(_target != address(this), "GmxTimelock: invalid _target");
-        IAdmin(_target).setAdmin(_admin);
+        IAdmin_Original(_target).setAdmin(_admin);
     }
 
     function setContractHandler(address _handler, bool _isActive) external onlyAdmin {
@@ -130,13 +130,13 @@ contract GmxTimelock is IGmxTimelock {
 
     function setMaxLeverage(address _vault, uint256 _maxLeverage) external onlyAdmin {
       require(_maxLeverage > MAX_LEVERAGE_VALIDATION, "GmxTimelock: invalid _maxLeverage");
-      IVault(_vault).setMaxLeverage(_maxLeverage);
+      IVault_Original(_vault).setMaxLeverage(_maxLeverage);
     }
 
     function setFundingRate(address _vault, uint256 _fundingInterval, uint256 _fundingRateFactor, uint256 _stableFundingRateFactor) external onlyAdmin {
         require(_fundingRateFactor < MAX_FUNDING_RATE_FACTOR, "GmxTimelock: invalid _fundingRateFactor");
         require(_stableFundingRateFactor < MAX_FUNDING_RATE_FACTOR, "GmxTimelock: invalid _stableFundingRateFactor");
-        IVault(_vault).setFundingRate(_fundingInterval, _fundingRateFactor, _stableFundingRateFactor);
+        IVault_Original(_vault).setFundingRate(_fundingInterval, _fundingRateFactor, _stableFundingRateFactor);
     }
 
     function setFees(
@@ -159,7 +159,7 @@ contract GmxTimelock is IGmxTimelock {
         require(_marginFeeBasisPoints < MAX_FEE_BASIS_POINTS, "GmxTimelock: invalid _marginFeeBasisPoints");
         require(_liquidationFeeUsd < 10 * PRICE_PRECISION, "GmxTimelock: invalid _liquidationFeeUsd");
 
-        IVault(_vault).setFees(
+        IVault_Original(_vault).setFees(
             _taxBasisPoints,
             _stableTaxBasisPoints,
             _mintBurnFeeBasisPoints,
@@ -183,14 +183,14 @@ contract GmxTimelock is IGmxTimelock {
     ) external onlyAdmin {
         require(_minProfitBps <= 500, "GmxTimelock: invalid _minProfitBps");
 
-        IVault vault = IVault(_vault);
+        IVault_Original vault = IVault_Original(_vault);
         require(vault.whitelistedTokens(_token), "GmxTimelock: token not yet whitelisted");
 
         uint256 tokenDecimals = vault.tokenDecimals(_token);
         bool isStable = vault.stableTokens(_token);
         bool isShortable = vault.shortableTokens(_token);
 
-        IVault(_vault).setTokenConfig(
+        IVault_Original(_vault).setTokenConfig(
             _token,
             tokenDecimals,
             _tokenWeight,
@@ -200,86 +200,86 @@ contract GmxTimelock is IGmxTimelock {
             isShortable
         );
 
-        IVault(_vault).setBufferAmount(_token, _bufferAmount);
+        IVault_Original(_vault).setBufferAmount(_token, _bufferAmount);
 
-        IVault(_vault).setUsdgAmount(_token, _usdgAmount);
+        IVault_Original(_vault).setUsdgAmount(_token, _usdgAmount);
     }
 
     function setMaxGlobalShortSize(address _vault, address _token, uint256 _amount) external onlyAdmin {
-        IVault(_vault).setMaxGlobalShortSize(_token, _amount);
+        IVault_Original(_vault).setMaxGlobalShortSize(_token, _amount);
     }
 
     function removeAdmin(address _token, address _account) external onlyAdmin {
-        IYieldToken(_token).removeAdmin(_account);
+        IYieldToken_Original(_token).removeAdmin(_account);
     }
 
     function setIsAmmEnabled(address _priceFeed, bool _isEnabled) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setIsAmmEnabled(_isEnabled);
+        IVaultPriceFeed_Original(_priceFeed).setIsAmmEnabled(_isEnabled);
     }
 
     function setIsSecondaryPriceEnabled(address _priceFeed, bool _isEnabled) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setIsSecondaryPriceEnabled(_isEnabled);
+        IVaultPriceFeed_Original(_priceFeed).setIsSecondaryPriceEnabled(_isEnabled);
     }
 
     function setMaxStrictPriceDeviation(address _priceFeed, uint256 _maxStrictPriceDeviation) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setMaxStrictPriceDeviation(_maxStrictPriceDeviation);
+        IVaultPriceFeed_Original(_priceFeed).setMaxStrictPriceDeviation(_maxStrictPriceDeviation);
     }
 
     function setUseV2Pricing(address _priceFeed, bool _useV2Pricing) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setUseV2Pricing(_useV2Pricing);
+        IVaultPriceFeed_Original(_priceFeed).setUseV2Pricing(_useV2Pricing);
     }
 
     function setAdjustment(address _priceFeed, address _token, bool _isAdditive, uint256 _adjustmentBps) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setAdjustment(_token, _isAdditive, _adjustmentBps);
+        IVaultPriceFeed_Original(_priceFeed).setAdjustment(_token, _isAdditive, _adjustmentBps);
     }
 
     function setSpreadBasisPoints(address _priceFeed, address _token, uint256 _spreadBasisPoints) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setSpreadBasisPoints(_token, _spreadBasisPoints);
+        IVaultPriceFeed_Original(_priceFeed).setSpreadBasisPoints(_token, _spreadBasisPoints);
     }
 
     function setSpreadThresholdBasisPoints(address _priceFeed, uint256 _spreadThresholdBasisPoints) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setSpreadThresholdBasisPoints(_spreadThresholdBasisPoints);
+        IVaultPriceFeed_Original(_priceFeed).setSpreadThresholdBasisPoints(_spreadThresholdBasisPoints);
     }
 
     function setFavorPrimaryPrice(address _priceFeed, bool _favorPrimaryPrice) external onlyAdmin {
-        IVaultPriceFeed(_priceFeed).setFavorPrimaryPrice(_favorPrimaryPrice);
+        IVaultPriceFeed_Original(_priceFeed).setFavorPrimaryPrice(_favorPrimaryPrice);
     }
 
     function setPriceSampleSpace(address _priceFeed,uint256 _priceSampleSpace) external onlyAdmin {
         require(_priceSampleSpace <= 5, "Invalid _priceSampleSpace");
-        IVaultPriceFeed(_priceFeed).setPriceSampleSpace(_priceSampleSpace);
+        IVaultPriceFeed_Original(_priceFeed).setPriceSampleSpace(_priceSampleSpace);
     }
 
     function setIsSwapEnabled(address _vault, bool _isSwapEnabled) external onlyAdmin {
-        IVault(_vault).setIsSwapEnabled(_isSwapEnabled);
+        IVault_Original(_vault).setIsSwapEnabled(_isSwapEnabled);
     }
 
     function setIsLeverageEnabled(address _vault, bool _isLeverageEnabled) external override onlyAdminOrHandler {
-        IVault(_vault).setIsLeverageEnabled(_isLeverageEnabled);
+        IVault_Original(_vault).setIsLeverageEnabled(_isLeverageEnabled);
     }
 
-    function setVaultUtils(address _vault, IVaultUtils _vaultUtils) external onlyAdmin {
-        IVault(_vault).setVaultUtils(_vaultUtils);
+    function setVaultUtils(address _vault, IVaultUtils_Original _vaultUtils) external onlyAdmin {
+        IVault_Original(_vault).setVaultUtils(_vaultUtils);
     }
 
     function setMaxGasPrice(address _vault,uint256 _maxGasPrice) external onlyAdmin {
         require(_maxGasPrice > 5000000000, "Invalid _maxGasPrice");
-        IVault(_vault).setMaxGasPrice(_maxGasPrice);
+        IVault_Original(_vault).setMaxGasPrice(_maxGasPrice);
     }
 
     function withdrawFees(address _vault,address _token, address _receiver) external onlyAdmin {
-        IVault(_vault).withdrawFees(_token, _receiver);
+        IVault_Original(_vault).withdrawFees(_token, _receiver);
     }
 
     function setInPrivateLiquidationMode(address _vault, bool _inPrivateLiquidationMode) external onlyAdmin {
-        IVault(_vault).setInPrivateLiquidationMode(_inPrivateLiquidationMode);
+        IVault_Original(_vault).setInPrivateLiquidationMode(_inPrivateLiquidationMode);
     }
 
     function setLiquidator(address _vault, address _liquidator, bool _isActive) external onlyAdmin {
-        IVault(_vault).setLiquidator(_liquidator, _isActive);
+        IVault_Original(_vault).setLiquidator(_liquidator, _isActive);
     }
 
-    function addExcludedToken(address _token) external onlyAdmin {
+    function addExcludedToken_Original(address _token) external onlyAdmin {
         excludedTokens[_token] = true;
     }
 
@@ -289,11 +289,11 @@ contract GmxTimelock is IGmxTimelock {
             require(_inPrivateTransferMode == false, "GmxTimelock: invalid _inPrivateTransferMode");
         }
 
-        IBaseToken(_token).setInPrivateTransferMode(_inPrivateTransferMode);
+        IBaseToken_Original(_token).setInPrivateTransferMode(_inPrivateTransferMode);
     }
 
     function transferIn(address _sender, address _token, uint256 _amount) external onlyAdmin {
-        IERC20(_token).transferFrom(_sender, address(this), _amount);
+        IERC20_Original(_token).transferFrom(_sender, address(this), _amount);
     }
 
     function signalApprove(address _token, address _spender, uint256 _amount) external onlyAdmin {
@@ -306,20 +306,20 @@ contract GmxTimelock is IGmxTimelock {
         bytes32 action = keccak256(abi.encodePacked("approve", _token, _spender, _amount));
         _validateAction(action);
         _clearAction(action);
-        IERC20(_token).approve(_spender, _amount);
+        IERC20_Original(_token).approve(_spender, _amount);
     }
 
-    function signalWithdrawToken(address _target, address _token, address _receiver, uint256 _amount) external onlyAdmin {
+    function signalWithdrawToken_Original(address _target, address _token, address _receiver, uint256 _amount) external onlyAdmin {
         bytes32 action = keccak256(abi.encodePacked("withdrawToken", _target, _token, _receiver, _amount));
         _setPendingAction(action);
-        emit SignalWithdrawToken(_target, _token, _receiver, _amount, action);
+        emit SignalWithdrawToken_Original(_target, _token, _receiver, _amount, action);
     }
 
-    function withdrawToken(address _target, address _token, address _receiver, uint256 _amount) external onlyAdmin {
+    function withdrawToken_Original(address _target, address _token, address _receiver, uint256 _amount) external onlyAdmin {
         bytes32 action = keccak256(abi.encodePacked("withdrawToken", _target, _token, _receiver, _amount));
         _validateAction(action);
         _clearAction(action);
-        IBaseToken(_target).withdrawToken(_token, _receiver, _amount);
+        IBaseToken_Original(_target).withdrawToken_Original(_token, _receiver, _amount);
     }
 
     function signalMint(address _token, address _receiver, uint256 _amount) external onlyAdmin {
@@ -336,7 +336,7 @@ contract GmxTimelock is IGmxTimelock {
         _mint(_token, _receiver, _amount);
     }
 
-    function signalSetGov(address _target, address _gov) external override onlyTokenManager {
+    function signalSetGov(address _target, address _gov) external override onlyTokenManager_Original {
         bytes32 action = keccak256(abi.encodePacked("setGov", _target, _gov));
         _setLongPendingAction(action);
         emit SignalSetGov(_target, _gov, action);
@@ -346,7 +346,7 @@ contract GmxTimelock is IGmxTimelock {
         bytes32 action = keccak256(abi.encodePacked("setGov", _target, _gov));
         _validateAction(action);
         _clearAction(action);
-        ITimelockTarget(_target).setGov(_gov);
+        ITimelockTarget_Original(_target).setGov(_gov);
     }
 
     function signalSetPriceFeed(address _vault, address _priceFeed) external onlyAdmin {
@@ -359,7 +359,7 @@ contract GmxTimelock is IGmxTimelock {
         bytes32 action = keccak256(abi.encodePacked("setPriceFeed", _vault, _priceFeed));
         _validateAction(action);
         _clearAction(action);
-        IVault(_vault).setPriceFeed(_priceFeed);
+        IVault_Original(_vault).setPriceFeed(_priceFeed);
     }
 
     function signalAddPlugin(address _router, address _plugin) external onlyAdmin {
@@ -372,7 +372,7 @@ contract GmxTimelock is IGmxTimelock {
         bytes32 action = keccak256(abi.encodePacked("addPlugin", _router, _plugin));
         _validateAction(action);
         _clearAction(action);
-        IRouter(_router).addPlugin(_plugin);
+        IRouter_Original(_router).addPlugin(_plugin);
     }
 
     function signalRedeemUsdg(address _vault, address _token, uint256 _amount) external onlyAdmin {
@@ -386,17 +386,17 @@ contract GmxTimelock is IGmxTimelock {
         _validateAction(action);
         _clearAction(action);
 
-        address usdg = IVault(_vault).usdg();
-        IVault(_vault).setManager(address(this), true);
-        IUSDG(usdg).addVault(address(this));
+        address usdg = IVault_Original(_vault).usdg();
+        IVault_Original(_vault).setManager(address(this), true);
+        IUSDG_Original(usdg).addVault(address(this));
 
-        IUSDG(usdg).mint(address(this), _amount);
-        IERC20(usdg).transfer(address(_vault), _amount);
+        IUSDG_Original(usdg).mint(address(this), _amount);
+        IERC20_Original(usdg).transfer(address(_vault), _amount);
 
-        IVault(_vault).sellUSDG(_token, mintReceiver);
+        IVault_Original(_vault).sellUSDG(_token, mintReceiver);
 
-        IVault(_vault).setManager(address(this), false);
-        IUSDG(usdg).removeVault(address(this));
+        IVault_Original(_vault).setManager(address(this), false);
+        IUSDG_Original(usdg).removeVault(address(this));
     }
 
     function signalVaultSetTokenConfig(
@@ -460,7 +460,7 @@ contract GmxTimelock is IGmxTimelock {
         _validateAction(action);
         _clearAction(action);
 
-        IVault(_vault).setTokenConfig(
+        IVault_Original(_vault).setTokenConfig(
             _token,
             _tokenDecimals,
             _tokenWeight,
@@ -517,7 +517,7 @@ contract GmxTimelock is IGmxTimelock {
         _validateAction(action);
         _clearAction(action);
 
-        IVaultPriceFeed(_vaultPriceFeed).setTokenConfig(
+        IVaultPriceFeed_Original(_vaultPriceFeed).setTokenConfig(
             _token,
             _priceFeed,
             _priceDecimals,
@@ -530,14 +530,14 @@ contract GmxTimelock is IGmxTimelock {
     }
 
     function _mint(address _token, address _receiver, uint256 _amount) private {
-        IMintable mintable = IMintable(_token);
+        IMintable_Original mintable = IMintable_Original(_token);
 
         if (!mintable.isMinter(address(this))) {
             mintable.setMinter(address(this), true);
         }
 
         mintable.mint(_receiver, _amount);
-        require(IERC20(_token).totalSupply() <= maxTokenSupply, "GmxTimelock: maxTokenSupply exceeded");
+        require(IERC20_Original(_token).totalSupply() <= maxTokenSupply, "GmxTimelock: maxTokenSupply exceeded");
     }
 
     function _setPendingAction(bytes32 _action) private {

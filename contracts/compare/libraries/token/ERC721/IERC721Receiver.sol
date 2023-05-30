@@ -7,9 +7,9 @@ pragma solidity ^0.6.0;
  * @dev Interface for any contract that wants to support safeTransfers
  * from ERC721 asset contracts.
  */
-interface IERC721Receiver {
+interface IERC721Receiver_Original {
     /**
-     * @dev Whenever an {IERC721} `tokenId` token is transferred to this contract via {IERC721-safeTransferFrom}
+     * @dev Whenever an {IERC721_Original} `tokenId` token is transferred to this contract via_Original {IERC721_Original-safeTransferFrom}
      * by `operator` from `from`, this function is called.
      *
      * It must return its Solidity selector to confirm the token transfer.

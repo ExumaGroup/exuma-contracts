@@ -15,7 +15,7 @@ import "../GSN/Context.sol";
  * `onlyOwner`, which can be applied to your functions to restrict their use to
  * the owner.
  */
-contract Ownable is Context {
+contract Ownable_Original is Context_Original {
     address private _owner;
 
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);

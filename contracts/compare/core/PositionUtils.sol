@@ -10,7 +10,7 @@ import "./interfaces/IRouter.sol";
 import "./interfaces/IShortsTracker.sol";
 
 library PositionUtils {
-    using SafeMath for uint256;
+    using SafeMath_Original for uint256;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
 
@@ -34,7 +34,7 @@ library PositionUtils {
 
         address collateralToken = _path[_path.length - 1];
 
-        IVault vault = IVault(_vault);
+        IVault_Original vault = IVault_Original(_vault);
         (uint256 size, uint256 collateral, , , , , , ) = vault.getPosition(_account, collateralToken, _indexToken, _isLong);
 
         // if there is no existing position, do not charge a fee
@@ -57,7 +57,7 @@ library PositionUtils {
     function increasePosition(
         address _vault,
         address _router,
-        address _shortsTracker,
+        address _shortsTracker_Original,
         address _account,
         address _collateralToken,
         address _indexToken,
@@ -65,20 +65,20 @@ library PositionUtils {
         bool _isLong,
         uint256 _price
     ) external {
-        uint256 markPrice = _isLong ? IVault(_vault).getMaxPrice(_indexToken) : IVault(_vault).getMinPrice(_indexToken);
+        uint256 markPrice = _isLong ? IVault_Original(_vault).getMaxPrice(_indexToken) : IVault_Original(_vault).getMinPrice(_indexToken);
         if (_isLong) {
             require(markPrice <= _price, "markPrice > price");
         } else {
             require(markPrice >= _price, "markPrice < price");
         }
 
-        address timelock = IVault(_vault).gov();
+        address timelock = IVault_Original(_vault).gov();
 
         // should be called strictly before position is updated in Vault
-        IShortsTracker(_shortsTracker).updateGlobalShortData(_account, _collateralToken, _indexToken, _isLong, _sizeDelta, markPrice, true);
+        IShortsTracker_Original(_shortsTracker_Original).updateGlobalShortData(_account, _collateralToken, _indexToken, _isLong, _sizeDelta, markPrice, true);
 
-        ITimelock(timelock).enableLeverage(_vault);
-        IRouter(_router).pluginIncreasePosition(_account, _collateralToken, _indexToken, _sizeDelta, _isLong);
-        ITimelock(timelock).disableLeverage(_vault);
+        ITimelock_Original(timelock).enableLeverage(_vault);
+        IRouter_Original(_router).pluginIncreasePosition(_account, _collateralToken, _indexToken, _sizeDelta, _isLong);
+        ITimelock_Original(timelock).disableLeverage(_vault);
     }
 }

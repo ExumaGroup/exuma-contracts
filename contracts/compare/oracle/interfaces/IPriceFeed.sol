@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IPriceFeed {
+interface IPriceFeed_Original {
     function description() external view returns (string memory);
     function aggregator() external view returns (address);
     function latestAnswer() external view returns (int256);

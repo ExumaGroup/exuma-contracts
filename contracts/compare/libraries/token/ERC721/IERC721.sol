@@ -7,7 +7,7 @@ import "../../introspection/IERC165.sol";
 /**
  * @dev Required interface of an ERC721 compliant contract.
  */
-interface IERC721 is IERC165 {
+interface IERC721_Original is IERC165_Original {
     /**
      * @dev Emitted when `tokenId` token is transferred from `from` to `to`.
      */

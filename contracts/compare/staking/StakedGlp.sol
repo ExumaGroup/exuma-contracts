@@ -13,15 +13,15 @@ import "./interfaces/IRewardTracker.sol";
 // provide a way to transfer staked GLP tokens by unstaking from the sender
 // and staking for the receiver
 // tests in RewardRouterV2.js
-contract StakedGlp {
-    using SafeMath for uint256;
+contract StakedGlp_Original {
+    using SafeMath_Original for uint256;
 
     string public constant name = "StakedGlp";
     string public constant symbol = "sGLP";
     uint8 public constant decimals = 18;
 
     address public glp;
-    IGlpManager public glpManager;
+    IGlpManager_Original public glpManager;
     address public stakedGlpTracker;
     address public feeGlpTracker;
 
@@ -31,7 +31,7 @@ contract StakedGlp {
 
     constructor(
         address _glp,
-        IGlpManager _glpManager,
+        IGlpManager_Original _glpManager,
         address _stakedGlpTracker,
         address _feeGlpTracker
     ) public {
@@ -63,11 +63,11 @@ contract StakedGlp {
     }
 
     function balanceOf(address _account) external view returns (uint256) {
-        return IRewardTracker(feeGlpTracker).depositBalances(_account, glp);
+        return IRewardTracker_Original(feeGlpTracker).depositBalances(_account, glp);
     }
 
     function totalSupply() external view returns (uint256) {
-        return IERC20(stakedGlpTracker).totalSupply();
+        return IERC20_Original(stakedGlpTracker).totalSupply();
     }
 
     function _approve(address _owner, address _spender, uint256 _amount) private {
@@ -88,10 +88,10 @@ contract StakedGlp {
             "StakedGlp: cooldown duration not yet passed"
         );
 
-        IRewardTracker(stakedGlpTracker).unstakeForAccount(_sender, feeGlpTracker, _amount, _sender);
-        IRewardTracker(feeGlpTracker).unstakeForAccount(_sender, glp, _amount, _sender);
+        IRewardTracker_Original(stakedGlpTracker).unstakeForAccount(_sender, feeGlpTracker, _amount, _sender);
+        IRewardTracker_Original(feeGlpTracker).unstakeForAccount(_sender, glp, _amount, _sender);
 
-        IRewardTracker(feeGlpTracker).stakeForAccount(_sender, _recipient, glp, _amount);
-        IRewardTracker(stakedGlpTracker).stakeForAccount(_recipient, _recipient, feeGlpTracker, _amount);
+        IRewardTracker_Original(feeGlpTracker).stakeForAccount(_sender, _recipient, glp, _amount);
+        IRewardTracker_Original(stakedGlpTracker).stakeForAccount(_recipient, _recipient, feeGlpTracker, _amount);
     }
 }

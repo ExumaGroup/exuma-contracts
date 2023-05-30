@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IReferralStorage {
+interface IReferralStorage_Original {
     function codeOwners(bytes32 _code) external view returns (address);
     function traderReferralCodes(address _account) external view returns (bytes32);
     function referrerDiscountShares(address _account) external view returns (uint256);

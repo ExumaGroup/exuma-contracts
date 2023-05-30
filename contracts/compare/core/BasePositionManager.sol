@@ -21,18 +21,18 @@ import "../referrals/interfaces/IReferralStorage.sol";
 
 import "./PositionUtils.sol";
 
-contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governable {
+contract BasePositionManager_Original is IBasePositionManager_Original, ReentrancyGuard_Original, Governable_Original {
 
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
-    using Address for address payable;
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
+    using Address_Original for address payable;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
 
     address public admin;
 
     address public vault;
-    address public shortsTracker;
+    address public shortsTracker_Original;
     address public router;
     address public weth;
 
@@ -89,7 +89,7 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
     constructor(
         address _vault,
         address _router,
-        address _shortsTracker,
+        address _shortsTracker_Original,
         address _weth,
         uint256 _depositFee
     ) public {
@@ -97,7 +97,7 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
         router = _router;
         weth = _weth;
         depositFee = _depositFee;
-        shortsTracker = _shortsTracker;
+        shortsTracker_Original = _shortsTracker_Original;
 
         admin = msg.sender;
     }
@@ -150,13 +150,13 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
         if (amount == 0) { return; }
 
         feeReserves[_token] = 0;
-        IERC20(_token).safeTransfer(_receiver, amount);
+        IERC20_Original(_token).safeTransfer(_receiver, amount);
 
         emit WithdrawFees(_token, _receiver, amount);
     }
 
     function approve(address _token, address _spender, uint256 _amount) external onlyGov {
-        IERC20(_token).approve(_spender, _amount);
+        IERC20_Original(_token).approve(_spender, _amount);
     }
 
     function sendValue(address payable _receiver, uint256 _amount) external onlyGov {
@@ -170,12 +170,12 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
 
         if (_isLong) {
             uint256 maxGlobalLongSize = maxGlobalLongSizes[_indexToken];
-            if (maxGlobalLongSize > 0 && IVault(vault).guaranteedUsd(_indexToken).add(_sizeDelta) > maxGlobalLongSize) {
+            if (maxGlobalLongSize > 0 && IVault_Original(vault).guaranteedUsd(_indexToken).add(_sizeDelta) > maxGlobalLongSize) {
                 revert("max longs exceeded");
             }
         } else {
             uint256 maxGlobalShortSize = maxGlobalShortSizes[_indexToken];
-            if (maxGlobalShortSize > 0 && IVault(vault).globalShortSizes(_indexToken).add(_sizeDelta) > maxGlobalShortSize) {
+            if (maxGlobalShortSize > 0 && IVault_Original(vault).globalShortSizes(_indexToken).add(_sizeDelta) > maxGlobalShortSize) {
                 revert("max shorts exceeded");
             }
         }
@@ -187,7 +187,7 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
         PositionUtils.increasePosition(
             vault,
             router,
-            shortsTracker,
+            shortsTracker_Original,
             _account,
             _collateralToken,
             _indexToken,
@@ -202,21 +202,21 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
     function _decreasePosition(address _account, address _collateralToken, address _indexToken, uint256 _collateralDelta, uint256 _sizeDelta, bool _isLong, address _receiver, uint256 _price) internal returns (uint256) {
         address _vault = vault;
 
-        uint256 markPrice = _isLong ? IVault(_vault).getMinPrice(_indexToken) : IVault(_vault).getMaxPrice(_indexToken);
+        uint256 markPrice = _isLong ? IVault_Original(_vault).getMinPrice(_indexToken) : IVault_Original(_vault).getMaxPrice(_indexToken);
         if (_isLong) {
             require(markPrice >= _price, "markPrice < price");
         } else {
             require(markPrice <= _price, "markPrice > price");
         }
 
-        address timelock = IVault(_vault).gov();
+        address timelock = IVault_Original(_vault).gov();
 
         // should be called strictly before position is updated in Vault
-        IShortsTracker(shortsTracker).updateGlobalShortData(_account, _collateralToken, _indexToken, _isLong, _sizeDelta, markPrice, false);
+        IShortsTracker_Original(shortsTracker_Original).updateGlobalShortData(_account, _collateralToken, _indexToken, _isLong, _sizeDelta, markPrice, false);
 
-        ITimelock(timelock).enableLeverage(_vault);
-        uint256 amountOut = IRouter(router).pluginDecreasePosition(_account, _collateralToken, _indexToken, _collateralDelta, _sizeDelta, _isLong, _receiver);
-        ITimelock(timelock).disableLeverage(_vault);
+        ITimelock_Original(timelock).enableLeverage(_vault);
+        uint256 amountOut = IRouter_Original(router).pluginDecreasePosition(_account, _collateralToken, _indexToken, _collateralDelta, _sizeDelta, _isLong, _receiver);
+        ITimelock_Original(timelock).disableLeverage(_vault);
 
         _emitDecreasePositionReferral(
             _account,
@@ -234,19 +234,19 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
     }
 
     function _vaultSwap(address _tokenIn, address _tokenOut, uint256 _minOut, address _receiver) internal returns (uint256) {
-        uint256 amountOut = IVault(vault).swap(_tokenIn, _tokenOut, _receiver);
+        uint256 amountOut = IVault_Original(vault).swap(_tokenIn, _tokenOut, _receiver);
         require(amountOut >= _minOut, "insufficient amountOut");
         return amountOut;
     }
 
     function _transferInETH() internal {
         if (msg.value != 0) {
-            IWETH(weth).deposit{value: msg.value}();
+            IWETH_Original(weth).deposit{value: msg.value}();
         }
     }
 
     function _transferOutETHWithGasLimitFallbackToWeth(uint256 _amountOut, address payable _receiver) internal {
-        IWETH _weth = IWETH(weth);
+        IWETH_Original _weth = IWETH_Original(weth);
         _weth.withdraw(_amountOut);
 
         (bool success, /* bytes memory data */) = _receiver.call{ value: _amountOut, gas: ethTransferGasLimit }("");
@@ -293,15 +293,15 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
         if (_referralStorage == address(0)) { return; }
 
 
-        (bytes32 referralCode, address referrer) = IReferralStorage(_referralStorage).getTraderReferralInfo(_account);
+        (bytes32 referralCode, address referrer) = IReferralStorage_Original(_referralStorage).getTraderReferralInfo(_account);
         if (referralCode == bytes32(0)) { return; }
 
-        address timelock = IVault(vault).gov();
+        address timelock = IVault_Original(vault).gov();
 
         emit IncreasePositionReferral(
             _account,
             _sizeDelta,
-            ITimelock(timelock).marginFeeBasisPoints(),
+            ITimelock_Original(timelock).marginFeeBasisPoints(),
             referralCode,
             referrer
         );
@@ -311,15 +311,15 @@ contract BasePositionManager is IBasePositionManager, ReentrancyGuard, Governabl
         address _referralStorage = referralStorage;
         if (_referralStorage == address(0)) { return; }
 
-        (bytes32 referralCode, address referrer) = IReferralStorage(_referralStorage).getTraderReferralInfo(_account);
+        (bytes32 referralCode, address referrer) = IReferralStorage_Original(_referralStorage).getTraderReferralInfo(_account);
         if (referralCode == bytes32(0)) { return; }
 
-        address timelock = IVault(vault).gov();
+        address timelock = IVault_Original(vault).gov();
 
         emit DecreasePositionReferral(
             _account,
             _sizeDelta,
-            ITimelock(timelock).marginFeeBasisPoints(),
+            ITimelock_Original(timelock).marginFeeBasisPoints(),
             referralCode,
             referrer
         );

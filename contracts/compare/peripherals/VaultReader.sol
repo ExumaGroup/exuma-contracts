@@ -6,13 +6,13 @@ import "../core/interfaces/IVault.sol";
 import "../core/interfaces/IVaultPriceFeed.sol";
 import "../core/interfaces/IBasePositionManager.sol";
 
-contract VaultReader {
+contract VaultReader_Original {
     function getVaultTokenInfoV3(address _vault, address _positionManager, address _weth, uint256 _usdgAmount, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256 propsLength = 14;
 
-        IVault vault = IVault(_vault);
-        IVaultPriceFeed priceFeed = IVaultPriceFeed(vault.priceFeed());
-        IBasePositionManager positionManager = IBasePositionManager(_positionManager);
+        IVault_Original vault = IVault_Original(_vault);
+        IVaultPriceFeed_Original priceFeed = IVaultPriceFeed_Original(vault.priceFeed());
+        IBasePositionManager_Original positionManager = IBasePositionManager_Original(_positionManager);
 
         uint256[] memory amounts = new uint256[](_tokens.length * propsLength);
         for (uint256 i = 0; i < _tokens.length; i++) {
@@ -43,9 +43,9 @@ contract VaultReader {
     function getVaultTokenInfoV4(address _vault, address _positionManager, address _weth, uint256 _usdgAmount, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256 propsLength = 15;
 
-        IVault vault = IVault(_vault);
-        IVaultPriceFeed priceFeed = IVaultPriceFeed(vault.priceFeed());
-        IBasePositionManager positionManager = IBasePositionManager(_positionManager);
+        IVault_Original vault = IVault_Original(_vault);
+        IVaultPriceFeed_Original priceFeed = IVaultPriceFeed_Original(vault.priceFeed());
+        IBasePositionManager_Original positionManager = IBasePositionManager_Original(_positionManager);
 
         uint256[] memory amounts = new uint256[](_tokens.length * propsLength);
         for (uint256 i = 0; i < _tokens.length; i++) {

@@ -10,8 +10,8 @@ import "../amm/interfaces/IPancakeRouter.sol";
 import "./interfaces/IGMT.sol";
 import "../peripherals/interfaces/ITimelockTarget.sol";
 
-contract Treasury is ReentrancyGuard, ITimelockTarget {
-    using SafeMath for uint256;
+contract Treasury_Original is ReentrancyGuard_Original, ITimelockTarget_Original {
+    using SafeMath_Original for uint256;
 
     uint256 constant PRECISION = 1000000;
     uint256 constant BASIS_POINTS_DIVISOR = 10000;
@@ -114,14 +114,14 @@ contract Treasury is ReentrancyGuard, ITimelockTarget {
         require(swapAmounts[account] <= busdSlotCap, "Treasury: busdSlotCap exceeded");
 
         // receive BUSD
-        uint256 busdBefore = IERC20(busd).balanceOf(address(this));
-        IERC20(busd).transferFrom(account, address(this), _busdAmount);
-        uint256 busdAfter = IERC20(busd).balanceOf(address(this));
+        uint256 busdBefore = IERC20_Original(busd).balanceOf(address(this));
+        IERC20_Original(busd).transferFrom(account, address(this), _busdAmount);
+        uint256 busdAfter = IERC20_Original(busd).balanceOf(address(this));
         require(busdAfter.sub(busdBefore) == _busdAmount, "Treasury: invalid transfer");
 
         // send GMT
         uint256 gmtAmount = _busdAmount.mul(PRECISION).div(gmtPresalePrice);
-        IERC20(gmt).transfer(account, gmtAmount);
+        IERC20_Original(gmt).transfer(account, gmtAmount);
     }
 
     function addLiquidity() external onlyGov nonReentrant {
@@ -131,12 +131,12 @@ contract Treasury is ReentrancyGuard, ITimelockTarget {
         uint256 busdAmount = busdReceived.mul(busdBasisPoints).div(BASIS_POINTS_DIVISOR);
         uint256 gmtAmount = busdAmount.mul(PRECISION).div(gmtListingPrice);
 
-        IERC20(busd).approve(router, busdAmount);
-        IERC20(gmt).approve(router, gmtAmount);
+        IERC20_Original(busd).approve(router, busdAmount);
+        IERC20_Original(gmt).approve(router, gmtAmount);
 
-        IGMT(gmt).endMigration();
+        IGMT_Original(gmt).endMigration();
 
-        IPancakeRouter(router).addLiquidity(
+        IPancakeRouter_Original(router).addLiquidity(
             busd, // tokenA
             gmt, // tokenB
             busdAmount, // amountADesired
@@ -147,15 +147,15 @@ contract Treasury is ReentrancyGuard, ITimelockTarget {
             block.timestamp // deadline
         );
 
-        IGMT(gmt).beginMigration();
+        IGMT_Original(gmt).beginMigration();
 
         uint256 fundAmount = busdReceived.sub(busdAmount);
-        IERC20(busd).transfer(fund, fundAmount);
+        IERC20_Original(busd).transfer(fund, fundAmount);
     }
 
-    function withdrawToken(address _token, address _account, uint256 _amount) external override onlyGov nonReentrant {
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external override onlyGov nonReentrant {
         require(block.timestamp > unlockTime, "Treasury: unlockTime not yet passed");
-        IERC20(_token).transfer(_account, _amount);
+        IERC20_Original(_token).transfer(_account, _amount);
     }
 
     function increaseBusdBasisPoints(uint256 _busdBasisPoints) external onlyGov nonReentrant {

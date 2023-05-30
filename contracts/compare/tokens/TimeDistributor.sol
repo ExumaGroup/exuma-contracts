@@ -8,9 +8,9 @@ import "../libraries/token/SafeERC20.sol";
 
 import "./interfaces/IDistributor.sol";
 
-contract TimeDistributor is IDistributor {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract TimeDistributor_Original is IDistributor_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     uint256 public constant DISTRIBUTION_INTERVAL = 1 hours;
     address public gov;
@@ -91,13 +91,13 @@ contract TimeDistributor is IDistributor {
 
         if (amount == 0) { return 0; }
 
-        IERC20(rewardTokens[receiver]).safeTransfer(receiver, amount);
+        IERC20_Original(rewardTokens[receiver]).safeTransfer(receiver, amount);
 
         emit Distribute(receiver, amount);
         return amount;
     }
 
-    function getRewardToken(address _receiver) external override view returns (address) {
+    function getRewardToken_Original(address _receiver) external override view returns (address) {
         return rewardTokens[_receiver];
     }
 
@@ -108,7 +108,7 @@ contract TimeDistributor is IDistributor {
         uint256 intervals = getIntervals(_receiver);
         uint256 amount = _tokensPerInterval.mul(intervals);
 
-        if (IERC20(rewardTokens[_receiver]).balanceOf(address(this)) < amount) { return 0; }
+        if (IERC20_Original(rewardTokens[_receiver]).balanceOf(address(this)) < amount) { return 0; }
 
         return amount;
     }

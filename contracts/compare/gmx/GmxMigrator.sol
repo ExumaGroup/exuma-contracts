@@ -10,8 +10,8 @@ import "./interfaces/IGmxIou.sol";
 import "./interfaces/IAmmRouter.sol";
 import "./interfaces/IGmxMigrator.sol";
 
-contract GmxMigrator is ReentrancyGuard, IGmxMigrator {
-    using SafeMath for uint256;
+contract GmxMigrator_Original is ReentrancyGuard_Original, IGmxMigrator_Original {
+    using SafeMath_Original for uint256;
 
     bool public isInitialized;
     bool public isMigrationActive = true;
@@ -143,7 +143,7 @@ contract GmxMigrator is ReentrancyGuard, IGmxMigrator {
         tokenAmounts[_token] = tokenAmounts[_token].add(_tokenAmount);
         require(tokenAmounts[_token] < caps[_token], "GmxMigrator: token cap exceeded");
 
-        IERC20(_token).transferFrom(msg.sender, address(this), _tokenAmount);
+        IERC20_Original(_token).transferFrom(msg.sender, address(this), _tokenAmount);
 
         if (lpTokens[_token]) {
             address tokenA = lpTokenAs[_token];
@@ -151,12 +151,12 @@ contract GmxMigrator is ReentrancyGuard, IGmxMigrator {
             require(tokenA != address(0), "GmxMigrator: invalid tokenA");
             require(tokenB != address(0), "GmxMigrator: invalid tokenB");
 
-            IERC20(_token).approve(ammRouter, _tokenAmount);
-            IAmmRouter(ammRouter).removeLiquidity(tokenA, tokenB, _tokenAmount, 0, 0, address(this), block.timestamp);
+            IERC20_Original(_token).approve(ammRouter, _tokenAmount);
+            IAmmRouter_Original(ammRouter).removeLiquidity(tokenA, tokenB, _tokenAmount, 0, 0, address(this), block.timestamp);
         }
 
-        address iouToken = getIouToken(_token);
-        IGmxIou(iouToken).mint(msg.sender, mintAmount);
+        address iouToken = getIouToken_Original(_token);
+        IGmxIou_Original(iouToken).mint(msg.sender, mintAmount);
     }
 
     function signalApprove(address _token, address _spender, uint256 _amount) external nonReentrant onlyAdmin {
@@ -180,7 +180,7 @@ contract GmxMigrator is ReentrancyGuard, IGmxMigrator {
         _validateAction(action);
         _validateAuthorization(action);
 
-        IERC20(_token).approve(_spender, _amount);
+        IERC20_Original(_token).approve(_spender, _amount);
         _clearAction(action, _nonce);
     }
 
@@ -201,7 +201,7 @@ contract GmxMigrator is ReentrancyGuard, IGmxMigrator {
         return price;
     }
 
-    function getIouToken(address _token) public view returns (address) {
+    function getIouToken_Original(address _token) public view returns (address) {
         address iouToken = iouTokens[_token];
         require(iouToken != address(0), "GmxMigrator: invalid iou token");
         return iouToken;

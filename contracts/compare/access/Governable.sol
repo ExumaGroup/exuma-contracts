@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-contract Governable {
+contract Governable_Original {
     address public gov;
 
     constructor() public {
@@ -10,7 +10,7 @@ contract Governable {
     }
 
     modifier onlyGov() {
-        require(msg.sender == gov, "Governable: forbidden");
+        require(msg.sender == gov, "Governable_Original: forbidden");
         _;
     }
 

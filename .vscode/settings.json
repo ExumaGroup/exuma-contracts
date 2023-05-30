@@ -1,6 +1,14 @@
 {
 	"javascript.format.placeOpenBraceOnNewLineForControlBlocks": true,
 	"javascript.format.placeOpenBraceOnNewLineForFunctions": true,
+	
 	"typescript.format.placeOpenBraceOnNewLineForControlBlocks": true,
-	"typescript.format.placeOpenBraceOnNewLineForFunctions": true
+	"typescript.format.placeOpenBraceOnNewLineForFunctions": true,
+
+	"mochaExplorer.files": "tests/**/*.ts",
+	"mochaExplorer.watch": "tests/**/*.ts",
+	"mochaExplorer.parallel": false, // true does not work well with hardhat
+	"mochaExplorer.jobs": 1,
+	"mochaExplorer.fullTrace": true,
+	"mochaExplorer.exit": true
 }

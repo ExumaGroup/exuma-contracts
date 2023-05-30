@@ -10,9 +10,9 @@ import "../libraries/utils/ReentrancyGuard.sol";
 import "../tokens/interfaces/IMintable.sol";
 import "../access/TokenManager.sol";
 
-contract GmxFloor is ReentrancyGuard, TokenManager {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract GmxFloor_Original is ReentrancyGuard_Original, TokenManager_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
     uint256 public constant PRICE_PRECISION = 10 ** 30;
@@ -41,7 +41,7 @@ contract GmxFloor is ReentrancyGuard, TokenManager {
         uint256 _mintMultiplier,
         uint256 _multiplierPrecision,
         uint256 _minAuthorizations
-    ) public TokenManager(_minAuthorizations) {
+    ) public TokenManager_Original(_minAuthorizations) {
         gmx = _gmx;
 
         reserveToken = _reserveToken;
@@ -53,7 +53,7 @@ contract GmxFloor is ReentrancyGuard, TokenManager {
     }
 
     function initialize(address[] memory _signers) public override onlyAdmin {
-        TokenManager.initialize(_signers);
+        TokenManager_Original.initialize(_signers);
     }
 
     function setHandler(address _handler, bool _isHandler) public onlyAdmin {
@@ -85,8 +85,8 @@ contract GmxFloor is ReentrancyGuard, TokenManager {
         mintedSupply = mintedSupply.add(_amount);
         backedSupply = backedSupply.add(_amount);
 
-        IERC20(reserveToken).safeTransferFrom(msg.sender, address(this), cost);
-        IERC20(gmx).transfer(_receiver, _amount);
+        IERC20_Original(reserveToken).safeTransferFrom(msg.sender, address(this), cost);
+        IERC20_Original(gmx).transfer(_receiver, _amount);
 
         return cost;
     }
@@ -99,8 +99,8 @@ contract GmxFloor is ReentrancyGuard, TokenManager {
 
         backedSupply = backedSupply.sub(_amount);
 
-        IMintable(gmx).burn(msg.sender, _amount);
-        IERC20(reserveToken).safeTransfer(_receiver, amountOut);
+        IMintable_Original(gmx).burn(msg.sender, _amount);
+        IERC20_Original(reserveToken).safeTransfer(_receiver, amountOut);
 
         return amountOut;
     }
@@ -110,7 +110,7 @@ contract GmxFloor is ReentrancyGuard, TokenManager {
     }
 
     function getBurnAmountOut(uint256 _amount) public view returns (uint256) {
-        uint256 balance = IERC20(reserveToken).balanceOf(address(this));
+        uint256 balance = IERC20_Original(reserveToken).balanceOf(address(this));
         return _amount.mul(balance).div(backedSupply).mul(BURN_BASIS_POINTS).div(BASIS_POINTS_DIVISOR);
     }
 }

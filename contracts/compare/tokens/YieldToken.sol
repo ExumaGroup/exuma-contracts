@@ -9,9 +9,9 @@ import "../libraries/token/SafeERC20.sol";
 import "./interfaces/IYieldTracker.sol";
 import "./interfaces/IYieldToken.sol";
 
-contract YieldToken is IERC20, IYieldToken {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract YieldToken_Original is IERC20_Original, IYieldToken_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     string public name;
     string public symbol;
@@ -33,12 +33,12 @@ contract YieldToken is IERC20, IYieldToken {
     mapping (address => bool) public whitelistedHandlers;
 
     modifier onlyGov() {
-        require(msg.sender == gov, "YieldToken: forbidden");
+        require(msg.sender == gov, "YieldToken_Original: forbidden");
         _;
     }
 
     modifier onlyAdmin() {
-        require(admins[msg.sender], "YieldToken: forbidden");
+        require(admins[msg.sender], "YieldToken_Original: forbidden");
         _;
     }
 
@@ -72,8 +72,8 @@ contract YieldToken is IERC20, IYieldToken {
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external onlyGov {
-        IERC20(_token).safeTransfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external onlyGov {
+        IERC20_Original(_token).safeTransfer(_account, _amount);
     }
 
     function setInWhitelistMode(bool _inWhitelistMode) external onlyGov {
@@ -85,14 +85,14 @@ contract YieldToken is IERC20, IYieldToken {
     }
 
     function addNonStakingAccount(address _account) external onlyAdmin {
-        require(!nonStakingAccounts[_account], "YieldToken: _account already marked");
+        require(!nonStakingAccounts[_account], "YieldToken_Original: _account already marked");
         _updateRewards(_account);
         nonStakingAccounts[_account] = true;
         nonStakingSupply = nonStakingSupply.add(balances[_account]);
     }
 
     function removeNonStakingAccount(address _account) external onlyAdmin {
-        require(nonStakingAccounts[_account], "YieldToken: _account not marked");
+        require(nonStakingAccounts[_account], "YieldToken_Original: _account not marked");
         _updateRewards(_account);
         nonStakingAccounts[_account] = false;
         nonStakingSupply = nonStakingSupply.sub(balances[_account]);
@@ -101,14 +101,14 @@ contract YieldToken is IERC20, IYieldToken {
     function recoverClaim(address _account, address _receiver) external onlyAdmin {
         for (uint256 i = 0; i < yieldTrackers.length; i++) {
             address yieldTracker = yieldTrackers[i];
-            IYieldTracker(yieldTracker).claim(_account, _receiver);
+            IYieldTracker_Original(yieldTracker).claim(_account, _receiver);
         }
     }
 
     function claim(address _receiver) external {
         for (uint256 i = 0; i < yieldTrackers.length; i++) {
             address yieldTracker = yieldTrackers[i];
-            IYieldTracker(yieldTracker).claim(msg.sender, _receiver);
+            IYieldTracker_Original(yieldTracker).claim(msg.sender, _receiver);
         }
     }
 
@@ -142,14 +142,14 @@ contract YieldToken is IERC20, IYieldToken {
     }
 
     function transferFrom(address _sender, address _recipient, uint256 _amount) external override returns (bool) {
-        uint256 nextAllowance = allowances[_sender][msg.sender].sub(_amount, "YieldToken: transfer amount exceeds allowance");
+        uint256 nextAllowance = allowances[_sender][msg.sender].sub(_amount, "YieldToken_Original: transfer amount exceeds allowance");
         _approve(_sender, msg.sender, nextAllowance);
         _transfer(_sender, _recipient, _amount);
         return true;
     }
 
     function _mint(address _account, uint256 _amount) internal {
-        require(_account != address(0), "YieldToken: mint to the zero address");
+        require(_account != address(0), "YieldToken_Original: mint to the zero address");
 
         _updateRewards(_account);
 
@@ -164,11 +164,11 @@ contract YieldToken is IERC20, IYieldToken {
     }
 
     function _burn(address _account, uint256 _amount) internal {
-        require(_account != address(0), "YieldToken: burn from the zero address");
+        require(_account != address(0), "YieldToken_Original: burn from the zero address");
 
         _updateRewards(_account);
 
-        balances[_account] = balances[_account].sub(_amount, "YieldToken: burn amount exceeds balance");
+        balances[_account] = balances[_account].sub(_amount, "YieldToken_Original: burn amount exceeds balance");
         totalSupply = totalSupply.sub(_amount);
 
         if (nonStakingAccounts[_account]) {
@@ -179,17 +179,17 @@ contract YieldToken is IERC20, IYieldToken {
     }
 
     function _transfer(address _sender, address _recipient, uint256 _amount) private {
-        require(_sender != address(0), "YieldToken: transfer from the zero address");
-        require(_recipient != address(0), "YieldToken: transfer to the zero address");
+        require(_sender != address(0), "YieldToken_Original: transfer from the zero address");
+        require(_recipient != address(0), "YieldToken_Original: transfer to the zero address");
 
         if (inWhitelistMode) {
-            require(whitelistedHandlers[msg.sender], "YieldToken: msg.sender not whitelisted");
+            require(whitelistedHandlers[msg.sender], "YieldToken_Original: msg.sender not whitelisted");
         }
 
         _updateRewards(_sender);
         _updateRewards(_recipient);
 
-        balances[_sender] = balances[_sender].sub(_amount, "YieldToken: transfer amount exceeds balance");
+        balances[_sender] = balances[_sender].sub(_amount, "YieldToken_Original: transfer amount exceeds balance");
         balances[_recipient] = balances[_recipient].add(_amount);
 
         if (nonStakingAccounts[_sender]) {
@@ -203,8 +203,8 @@ contract YieldToken is IERC20, IYieldToken {
     }
 
     function _approve(address _owner, address _spender, uint256 _amount) private {
-        require(_owner != address(0), "YieldToken: approve from the zero address");
-        require(_spender != address(0), "YieldToken: approve to the zero address");
+        require(_owner != address(0), "YieldToken_Original: approve from the zero address");
+        require(_spender != address(0), "YieldToken_Original: approve to the zero address");
 
         allowances[_owner][_spender] = _amount;
 
@@ -214,7 +214,7 @@ contract YieldToken is IERC20, IYieldToken {
     function _updateRewards(address _account) private {
         for (uint256 i = 0; i < yieldTrackers.length; i++) {
             address yieldTracker = yieldTrackers[i];
-            IYieldTracker(yieldTracker).updateRewards(_account);
+            IYieldTracker_Original(yieldTracker).updateRewards(_account);
         }
     }
 }

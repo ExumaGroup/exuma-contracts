@@ -14,8 +14,8 @@ import "../amm/interfaces/IPancakeFactory.sol";
 import "../staking/interfaces/IVester.sol";
 import "../access/Governable.sol";
 
-contract Reader is Governable {
-    using SafeMath for uint256;
+contract Reader_Original is Governable_Original {
+    using SafeMath_Original for uint256;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
     uint256 public constant POSITION_PROPS_LENGTH = 9;
@@ -28,7 +28,7 @@ contract Reader is Governable {
         hasMaxGlobalShortSizes = _hasMaxGlobalShortSizes;
     }
 
-    function getMaxAmountIn(IVault _vault, address _tokenIn, address _tokenOut) public view returns (uint256) {
+    function getMaxAmountIn(IVault_Original _vault, address _tokenIn, address _tokenOut) public view returns (uint256) {
         uint256 priceIn = _vault.getMinPrice(_tokenIn);
         uint256 priceOut = _vault.getMaxPrice(_tokenOut);
 
@@ -68,7 +68,7 @@ contract Reader is Governable {
         return amountIn;
     }
 
-    function getAmountOut(IVault _vault, address _tokenIn, address _tokenOut, uint256 _amountIn) public view returns (uint256, uint256) {
+    function getAmountOut(IVault_Original _vault, address _tokenIn, address _tokenOut, uint256 _amountIn) public view returns (uint256, uint256) {
         uint256 priceIn = _vault.getMinPrice(_tokenIn);
 
         uint256 tokenInDecimals = _vault.tokenDecimals(_tokenIn);
@@ -98,7 +98,7 @@ contract Reader is Governable {
         return (amountOutAfterFees, feeAmount);
     }
 
-    function getFeeBasisPoints(IVault _vault, address _tokenIn, address _tokenOut, uint256 _amountIn) public view returns (uint256, uint256, uint256) {
+    function getFeeBasisPoints(IVault_Original _vault, address _tokenIn, address _tokenOut, uint256 _amountIn) public view returns (uint256, uint256, uint256) {
         uint256 priceIn = _vault.getMinPrice(_tokenIn);
         uint256 tokenInDecimals = _vault.tokenDecimals(_tokenIn);
 
@@ -119,7 +119,7 @@ contract Reader is Governable {
     function getFees(address _vault, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256[] memory amounts = new uint256[](_tokens.length);
         for (uint256 i = 0; i < _tokens.length; i++) {
-            amounts[i] = IVault(_vault).feeReserves(_tokens[i]);
+            amounts[i] = IVault_Original(_vault).feeReserves(_tokens[i]);
         }
         return amounts;
     }
@@ -127,7 +127,7 @@ contract Reader is Governable {
     function getTotalStaked(address[] memory _yieldTokens) public view returns (uint256[] memory) {
         uint256[] memory amounts = new uint256[](_yieldTokens.length);
         for (uint256 i = 0; i < _yieldTokens.length; i++) {
-            IYieldToken yieldToken = IYieldToken(_yieldTokens[i]);
+            IYieldToken_Original yieldToken = IYieldToken_Original(_yieldTokens[i]);
             amounts[i] = yieldToken.totalStaked();
         }
         return amounts;
@@ -137,7 +137,7 @@ contract Reader is Governable {
         uint256 propsLength = 2;
         uint256[] memory amounts = new uint256[](_yieldTrackers.length * propsLength);
         for (uint256 i = 0; i < _yieldTrackers.length; i++) {
-            IYieldTracker yieldTracker = IYieldTracker(_yieldTrackers[i]);
+            IYieldTracker_Original yieldTracker = IYieldTracker_Original(_yieldTrackers[i]);
             amounts[i * propsLength] = yieldTracker.claimable(_account);
             amounts[i * propsLength + 1] = yieldTracker.getTokensPerInterval();
         }
@@ -148,10 +148,10 @@ contract Reader is Governable {
         uint256 propsLength = 7;
         uint256[] memory amounts = new uint256[](_vesters.length * propsLength);
         for (uint256 i = 0; i < _vesters.length; i++) {
-            IVester vester = IVester(_vesters[i]);
+            IVester_Original vester = IVester_Original(_vesters[i]);
             amounts[i * propsLength] = vester.pairAmounts(_account);
             amounts[i * propsLength + 1] = vester.getVestedAmount(_account);
-            amounts[i * propsLength + 2] = IERC20(_vesters[i]).balanceOf(_account);
+            amounts[i * propsLength + 2] = IERC20_Original(_vesters[i]).balanceOf(_account);
             amounts[i * propsLength + 3] = vester.claimedAmounts(_account);
             amounts[i * propsLength + 4] = vester.claimable(_account);
             amounts[i * propsLength + 5] = vester.getMaxVestableAmount(_account);
@@ -167,10 +167,10 @@ contract Reader is Governable {
         for (uint256 i = 0; i < _tokens.length / inputLength; i++) {
             address token0 = _tokens[i * inputLength];
             address token1 = _tokens[i * inputLength + 1];
-            address pair = IPancakeFactory(_factory).getPair(token0, token1);
+            address pair = IPancakeFactory_Original(_factory).getPair(token0, token1);
 
-            amounts[i * propsLength] = IERC20(token0).balanceOf(pair);
-            amounts[i * propsLength + 1] = IERC20(token1).balanceOf(pair);
+            amounts[i * propsLength] = IERC20_Original(token0).balanceOf(pair);
+            amounts[i * propsLength + 1] = IERC20_Original(token1).balanceOf(pair);
         }
         return amounts;
     }
@@ -178,7 +178,7 @@ contract Reader is Governable {
     function getFundingRates(address _vault, address _weth, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256 propsLength = 2;
         uint256[] memory fundingRates = new uint256[](_tokens.length * propsLength);
-        IVault vault = IVault(_vault);
+        IVault_Original vault = IVault_Original(_vault);
 
         for (uint256 i = 0; i < _tokens.length; i++) {
             address token = _tokens[i];
@@ -204,7 +204,7 @@ contract Reader is Governable {
         return fundingRates;
     }
 
-    function getTokenSupply(IERC20 _token, address[] memory _excludedAccounts) public view returns (uint256) {
+    function getTokenSupply(IERC20_Original _token, address[] memory _excludedAccounts) public view returns (uint256) {
         uint256 supply = _token.totalSupply();
         for (uint256 i = 0; i < _excludedAccounts.length; i++) {
             address account = _excludedAccounts[i];
@@ -214,7 +214,7 @@ contract Reader is Governable {
         return supply;
     }
 
-    function getTotalBalance(IERC20 _token, address[] memory _accounts) public view returns (uint256) {
+    function getTotalBalance(IERC20_Original _token, address[] memory _accounts) public view returns (uint256) {
         uint256 totalBalance = 0;
         for (uint256 i = 0; i < _accounts.length; i++) {
             address account = _accounts[i];
@@ -232,7 +232,7 @@ contract Reader is Governable {
                 balances[i] = _account.balance;
                 continue;
             }
-            balances[i] = IERC20(token).balanceOf(_account);
+            balances[i] = IERC20_Original(token).balanceOf(_account);
         }
         return balances;
     }
@@ -247,13 +247,13 @@ contract Reader is Governable {
                 balances[i * propsLength + 1] = 0;
                 continue;
             }
-            balances[i * propsLength] = IERC20(token).balanceOf(_account);
-            balances[i * propsLength + 1] = IERC20(token).totalSupply();
+            balances[i * propsLength] = IERC20_Original(token).balanceOf(_account);
+            balances[i * propsLength + 1] = IERC20_Original(token).totalSupply();
         }
         return balances;
     }
 
-    function getPrices(IVaultPriceFeed _priceFeed, address[] memory _tokens) public view returns (uint256[] memory) {
+    function getPrices(IVaultPriceFeed_Original _priceFeed, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256 propsLength = 6;
 
         uint256[] memory amounts = new uint256[](_tokens.length * propsLength);
@@ -274,8 +274,8 @@ contract Reader is Governable {
     function getVaultTokenInfo(address _vault, address _weth, uint256 _usdgAmount, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256 propsLength = 10;
 
-        IVault vault = IVault(_vault);
-        IVaultPriceFeed priceFeed = IVaultPriceFeed(vault.priceFeed());
+        IVault_Original vault = IVault_Original(_vault);
+        IVaultPriceFeed_Original priceFeed = IVaultPriceFeed_Original(vault.priceFeed());
 
         uint256[] memory amounts = new uint256[](_tokens.length * propsLength);
         for (uint256 i = 0; i < _tokens.length; i++) {
@@ -301,8 +301,8 @@ contract Reader is Governable {
     function getFullVaultTokenInfo(address _vault, address _weth, uint256 _usdgAmount, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256 propsLength = 12;
 
-        IVault vault = IVault(_vault);
-        IVaultPriceFeed priceFeed = IVaultPriceFeed(vault.priceFeed());
+        IVault_Original vault = IVault_Original(_vault);
+        IVaultPriceFeed_Original priceFeed = IVaultPriceFeed_Original(vault.priceFeed());
 
         uint256[] memory amounts = new uint256[](_tokens.length * propsLength);
         for (uint256 i = 0; i < _tokens.length; i++) {
@@ -330,8 +330,8 @@ contract Reader is Governable {
     function getVaultTokenInfoV2(address _vault, address _weth, uint256 _usdgAmount, address[] memory _tokens) public view returns (uint256[] memory) {
         uint256 propsLength = 14;
 
-        IVault vault = IVault(_vault);
-        IVaultPriceFeed priceFeed = IVaultPriceFeed(vault.priceFeed());
+        IVault_Original vault = IVault_Original(_vault);
+        IVaultPriceFeed_Original priceFeed = IVaultPriceFeed_Original(vault.priceFeed());
 
         uint256[] memory amounts = new uint256[](_tokens.length * propsLength);
         for (uint256 i = 0; i < _tokens.length; i++) {
@@ -372,7 +372,7 @@ contract Reader is Governable {
              /* reserveAmount */,
              uint256 realisedPnl,
              bool hasRealisedProfit,
-             uint256 lastIncreasedTime) = IVault(_vault).getPosition(_account, _collateralTokens[i], _indexTokens[i], _isLong[i]);
+             uint256 lastIncreasedTime) = IVault_Original(_vault).getPosition(_account, _collateralTokens[i], _indexTokens[i], _isLong[i]);
 
             amounts[i * POSITION_PROPS_LENGTH] = size;
             amounts[i * POSITION_PROPS_LENGTH + 1] = collateral;
@@ -387,7 +387,7 @@ contract Reader is Governable {
             uint256 averagePrice = amounts[i * POSITION_PROPS_LENGTH + 2];
             uint256 lastIncreasedTime = amounts[i * POSITION_PROPS_LENGTH + 6];
             if (averagePrice > 0) {
-                (bool hasProfit, uint256 delta) = IVault(_vault).getDelta(_indexTokens[i], size, averagePrice, _isLong[i], lastIncreasedTime);
+                (bool hasProfit, uint256 delta) = IVault_Original(_vault).getDelta(_indexTokens[i], size, averagePrice, _isLong[i], lastIncreasedTime);
                 amounts[i * POSITION_PROPS_LENGTH + 7] = hasProfit ? 1 : 0;
                 amounts[i * POSITION_PROPS_LENGTH + 8] = delta;
             }

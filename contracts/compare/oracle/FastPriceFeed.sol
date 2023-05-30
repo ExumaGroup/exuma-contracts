@@ -11,8 +11,8 @@ import "../access/Governable.sol";
 
 pragma solidity 0.6.12;
 
-contract FastPriceFeed is ISecondaryPriceFeed, IFastPriceFeed, Governable {
-    using SafeMath for uint256;
+contract FastPriceFeed_Original is ISecondaryPriceFeed_Original, IFastPriceFeed_Original, Governable_Original {
+    using SafeMath_Original for uint256;
 
     // fit data in a uint256 slot to save gas costs
     struct PriceDataItem {
@@ -95,7 +95,7 @@ contract FastPriceFeed is ISecondaryPriceFeed, IFastPriceFeed, Governable {
         _;
     }
 
-    modifier onlyTokenManager() {
+    modifier onlyTokenManager_Original() {
         require(msg.sender == tokenManager, "FastPriceFeed: forbidden");
         _;
     }
@@ -183,26 +183,26 @@ contract FastPriceFeed is ISecondaryPriceFeed, IFastPriceFeed, Governable {
         lastUpdatedAt = _lastUpdatedAt;
     }
 
-    function setTokenManager(address _tokenManager) external onlyTokenManager {
+    function setTokenManager_Original(address _tokenManager) external onlyTokenManager_Original {
         tokenManager = _tokenManager;
     }
 
-    function setMaxDeviationBasisPoints(uint256 _maxDeviationBasisPoints) external override onlyTokenManager {
+    function setMaxDeviationBasisPoints(uint256 _maxDeviationBasisPoints) external override onlyTokenManager_Original {
         maxDeviationBasisPoints = _maxDeviationBasisPoints;
     }
 
-    function setMaxCumulativeDeltaDiffs(address[] memory _tokens,  uint256[] memory _maxCumulativeDeltaDiffs) external override onlyTokenManager {
+    function setMaxCumulativeDeltaDiffs(address[] memory _tokens,  uint256[] memory _maxCumulativeDeltaDiffs) external override onlyTokenManager_Original {
         for (uint256 i = 0; i < _tokens.length; i++) {
             address token = _tokens[i];
             maxCumulativeDeltaDiffs[token] = _maxCumulativeDeltaDiffs[i];
         }
     }
 
-    function setPriceDataInterval(uint256 _priceDataInterval) external override onlyTokenManager {
+    function setPriceDataInterval(uint256 _priceDataInterval) external override onlyTokenManager_Original {
         priceDataInterval = _priceDataInterval;
     }
 
-    function setMinAuthorizations(uint256 _minAuthorizations) external onlyTokenManager {
+    function setMinAuthorizations(uint256 _minAuthorizations) external onlyTokenManager_Original {
         minAuthorizations = _minAuthorizations;
     }
 
@@ -268,7 +268,7 @@ contract FastPriceFeed is ISecondaryPriceFeed, IFastPriceFeed, Governable {
     ) external onlyUpdater {
         _setPricesWithBits(_priceBits, _timestamp);
 
-        IPositionRouter positionRouter = IPositionRouter(_positionRouter);
+        IPositionRouter_Original positionRouter = IPositionRouter_Original(_positionRouter);
         uint256 maxEndIndexForIncrease = positionRouter.increasePositionRequestKeysStart().add(_maxIncreasePositions);
         uint256 maxEndIndexForDecrease = positionRouter.decreasePositionRequestKeysStart().add(_maxDecreasePositions);
 
@@ -401,7 +401,7 @@ contract FastPriceFeed is ISecondaryPriceFeed, IFastPriceFeed, Governable {
 
     function _setPrice(address _token, uint256 _price, address _vaultPriceFeed, address _fastPriceEvents) private {
         if (_vaultPriceFeed != address(0)) {
-            uint256 refPrice = IVaultPriceFeed(_vaultPriceFeed).getLatestPrimaryPrice(_token);
+            uint256 refPrice = IVaultPriceFeed_Original(_vaultPriceFeed).getLatestPrimaryPrice(_token);
             uint256 fastPrice = prices[_token];
 
             (uint256 prevRefPrice, uint256 refTime, uint256 cumulativeRefDelta, uint256 cumulativeFastDelta) = getPriceData(_token);
@@ -451,7 +451,7 @@ contract FastPriceFeed is ISecondaryPriceFeed, IFastPriceFeed, Governable {
             return;
         }
 
-        IFastPriceEvents(_fastPriceEvents).emitPriceEvent(_token, _price);
+        IFastPriceEvents_Original(_fastPriceEvents).emitPriceEvent(_token, _price);
     }
 
     function _setLastUpdatedValues(uint256 _timestamp) private returns (bool) {

@@ -11,9 +11,9 @@ import "./interfaces/IRewardDistributor.sol";
 import "./interfaces/IRewardTracker.sol";
 import "../access/Governable.sol";
 
-contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract BonusDistributor_Original is IRewardDistributor_Original, ReentrancyGuard_Original, Governable_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
     uint256 public constant BONUS_DURATION = 365 days;
@@ -45,8 +45,8 @@ contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external onlyGov {
-        IERC20(_token).safeTransfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external onlyGov {
+        IERC20_Original(_token).safeTransfer(_account, _amount);
     }
 
     function updateLastDistributionTime() external onlyAdmin {
@@ -55,13 +55,13 @@ contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
 
     function setBonusMultiplier(uint256 _bonusMultiplierBasisPoints) external onlyAdmin {
         require(lastDistributionTime != 0, "BonusDistributor: invalid lastDistributionTime");
-        IRewardTracker(rewardTracker).updateRewards();
+        IRewardTracker_Original(rewardTracker).updateRewards();
         bonusMultiplierBasisPoints = _bonusMultiplierBasisPoints;
         emit BonusMultiplierChange(_bonusMultiplierBasisPoints);
     }
 
     function tokensPerInterval() public view override returns (uint256) {
-        uint256 supply = IERC20(rewardTracker).totalSupply();
+        uint256 supply = IERC20_Original(rewardTracker).totalSupply();
         return supply.mul(bonusMultiplierBasisPoints).div(BASIS_POINTS_DIVISOR).div(BONUS_DURATION);
     }
 
@@ -70,7 +70,7 @@ contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
             return 0;
         }
 
-        uint256 supply = IERC20(rewardTracker).totalSupply();
+        uint256 supply = IERC20_Original(rewardTracker).totalSupply();
         uint256 timeDiff = block.timestamp.sub(lastDistributionTime);
 
         return timeDiff.mul(supply).mul(bonusMultiplierBasisPoints).div(BASIS_POINTS_DIVISOR).div(BONUS_DURATION);
@@ -83,10 +83,10 @@ contract BonusDistributor is IRewardDistributor, ReentrancyGuard, Governable {
 
         lastDistributionTime = block.timestamp;
 
-        uint256 balance = IERC20(rewardToken).balanceOf(address(this));
+        uint256 balance = IERC20_Original(rewardToken).balanceOf(address(this));
         if (amount > balance) { amount = balance; }
 
-        IERC20(rewardToken).safeTransfer(msg.sender, amount);
+        IERC20_Original(rewardToken).safeTransfer(msg.sender, amount);
 
         emit Distribute(amount);
         return amount;

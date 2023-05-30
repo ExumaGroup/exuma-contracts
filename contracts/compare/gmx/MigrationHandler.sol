@@ -10,8 +10,8 @@ import "./interfaces/IAmmRouter.sol";
 import "./interfaces/IGmxMigrator.sol";
 import "../core/interfaces/IVault.sol";
 
-contract MigrationHandler is ReentrancyGuard {
-    using SafeMath for uint256;
+contract MigrationHandler_Original is ReentrancyGuard_Original {
+    using SafeMath_Original for uint256;
 
     uint256 public constant USDG_PRECISION = 10 ** 18;
 
@@ -70,8 +70,8 @@ contract MigrationHandler is ReentrancyGuard {
         address _redemptionToken,
         uint256 _usdgAmount
     ) external onlyAdmin nonReentrant {
-        IERC20(usdg).transferFrom(_migrator, vault, _usdgAmount);
-        uint256 amount = IVault(vault).sellUSDG(_redemptionToken, address(this));
+        IERC20_Original(usdg).transferFrom(_migrator, vault, _usdgAmount);
+        uint256 amount = IVault_Original(vault).sellUSDG(_redemptionToken, address(this));
 
         address[] memory path = new address[](2);
         path[0] = bnb;
@@ -84,8 +84,8 @@ contract MigrationHandler is ReentrancyGuard {
             path[2] = busd;
         }
 
-        IERC20(_redemptionToken).approve(ammRouterV2, amount);
-        IAmmRouter(ammRouterV2).swapExactTokensForTokens(
+        IERC20_Original(_redemptionToken).approve(ammRouterV2, amount);
+        IAmmRouter_Original(ammRouterV2).swapExactTokensForTokens(
             amount,
             0,
             path,
@@ -104,9 +104,9 @@ contract MigrationHandler is ReentrancyGuard {
 
         path[0] = gmt;
         path[1] = usdg;
-        IERC20(gmt).transferFrom(_migrator, address(this), _gmtAmountForUsdg);
-        IERC20(gmt).approve(ammRouterV2, _gmtAmountForUsdg);
-        IAmmRouter(ammRouterV2).swapExactTokensForTokens(
+        IERC20_Original(gmt).transferFrom(_migrator, address(this), _gmtAmountForUsdg);
+        IERC20_Original(gmt).approve(ammRouterV2, _gmtAmountForUsdg);
+        IAmmRouter_Original(ammRouterV2).swapExactTokensForTokens(
             _gmtAmountForUsdg,
             0,
             path,
@@ -116,9 +116,9 @@ contract MigrationHandler is ReentrancyGuard {
 
         path[0] = xgmt;
         path[1] = usdg;
-        IERC20(xgmt).transferFrom(_migrator, address(this), _xgmtAmountForUsdg);
-        IERC20(xgmt).approve(ammRouterV2, _xgmtAmountForUsdg);
-        IAmmRouter(ammRouterV2).swapExactTokensForTokens(
+        IERC20_Original(xgmt).transferFrom(_migrator, address(this), _xgmtAmountForUsdg);
+        IERC20_Original(xgmt).approve(ammRouterV2, _xgmtAmountForUsdg);
+        IAmmRouter_Original(ammRouterV2).swapExactTokensForTokens(
             _xgmtAmountForUsdg,
             0,
             path,
@@ -128,9 +128,9 @@ contract MigrationHandler is ReentrancyGuard {
 
         path[0] = gmt;
         path[1] = busd;
-        IERC20(gmt).transferFrom(_migrator, address(this), _gmtAmountForBusd);
-        IERC20(gmt).approve(ammRouterV1, _gmtAmountForBusd);
-        IAmmRouter(ammRouterV1).swapExactTokensForTokens(
+        IERC20_Original(gmt).transferFrom(_migrator, address(this), _gmtAmountForBusd);
+        IERC20_Original(gmt).approve(ammRouterV1, _gmtAmountForBusd);
+        IAmmRouter_Original(ammRouterV1).swapExactTokensForTokens(
             _gmtAmountForBusd,
             0,
             path,
@@ -145,8 +145,8 @@ contract MigrationHandler is ReentrancyGuard {
         address _token,
         uint256 _usdgAmount
     ) external onlyAdmin nonReentrant {
-        address iouToken = IGmxMigrator(_migrator).iouTokens(_token);
-        uint256 iouBalance = IERC20(iouToken).balanceOf(_account);
+        address iouToken = IGmxMigrator_Original(_migrator).iouTokens(_token);
+        uint256 iouBalance = IERC20_Original(iouToken).balanceOf(_account);
         uint256 iouTokenAmount = _usdgAmount.div(2); // each GMX is priced at $2
 
         uint256 refunded = refundedAmounts[_account][iouToken];
@@ -154,6 +154,6 @@ contract MigrationHandler is ReentrancyGuard {
 
         require(refundedAmounts[_account][iouToken] <= iouBalance, "MigrationHandler: refundable amount exceeded");
 
-        IERC20(usdg).transferFrom(_migrator, _account, _usdgAmount);
+        IERC20_Original(usdg).transferFrom(_migrator, _account, _usdgAmount);
     }
 }

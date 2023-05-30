@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IAmmRouter {
+interface IAmmRouter_Original {
     function removeLiquidity(
         address tokenA,
         address tokenB,

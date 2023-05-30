@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 
 import "./interfaces/IPriceFeed.sol";
 
-contract PriceFeed is IPriceFeed {
+contract PriceFeed_Original is IPriceFeed_Original {
     int256 public answer;
     uint80 public roundId;
     string public override description = "PriceFeed";

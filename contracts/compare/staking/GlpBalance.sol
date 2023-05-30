@@ -6,10 +6,10 @@ import "../libraries/math/SafeMath.sol";
 import "../libraries/token/IERC20.sol";
 import "../core/interfaces/IGlpManager.sol";
 
-contract GlpBalance {
-    using SafeMath for uint256;
+contract GlpBalance_Original {
+    using SafeMath_Original for uint256;
 
-    IGlpManager public glpManager;
+    IGlpManager_Original public glpManager;
     address public stakedGlpTracker;
 
     mapping (address => mapping (address => uint256)) public allowances;
@@ -17,7 +17,7 @@ contract GlpBalance {
     event Approval(address indexed owner, address indexed spender, uint256 value);
 
     constructor(
-        IGlpManager _glpManager,
+        IGlpManager_Original _glpManager,
         address _stakedGlpTracker
     ) public {
         glpManager = _glpManager;
@@ -63,6 +63,6 @@ contract GlpBalance {
             "GlpBalance: cooldown duration not yet passed"
         );
 
-        IERC20(stakedGlpTracker).transferFrom(_sender, _recipient, _amount);
+        IERC20_Original(stakedGlpTracker).transferFrom(_sender, _recipient, _amount);
     }
 }

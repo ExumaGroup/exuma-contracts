@@ -4,10 +4,10 @@ pragma solidity 0.6.12;
 
 import "./IVault.sol";
 
-interface IGlpManager {
+interface IGlpManager_Original {
     function glp() external view returns (address);
     function usdg() external view returns (address);
-    function vault() external view returns (IVault);
+    function vault() external view returns (IVault_Original);
     function cooldownDuration() external returns (uint256);
     function getAumInUsdg(bool maximise) external view returns (uint256);
     function lastAddedAt(address _account) external returns (uint256);

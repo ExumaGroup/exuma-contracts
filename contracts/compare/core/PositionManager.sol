@@ -9,7 +9,7 @@ import "./interfaces/IOrderBook.sol";
 import "../peripherals/interfaces/ITimelock.sol";
 import "./BasePositionManager.sol";
 
-contract PositionManager is BasePositionManager {
+contract PositionManager_Original is BasePositionManager_Original {
 
     address public orderBook;
     bool public inLegacyMode;
@@ -44,11 +44,11 @@ contract PositionManager is BasePositionManager {
     constructor(
         address _vault,
         address _router,
-        address _shortsTracker,
+        address _shortsTracker_Original,
         address _weth,
         uint256 _depositFee,
         address _orderBook
-    ) public BasePositionManager(_vault, _router, _shortsTracker, _weth, _depositFee) {
+    ) public BasePositionManager_Original(_vault, _router, _shortsTracker_Original, _weth, _depositFee) {
         orderBook = _orderBook;
     }
 
@@ -90,14 +90,14 @@ contract PositionManager is BasePositionManager {
 
         if (_amountIn > 0) {
             if (_path.length == 1) {
-                IRouter(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
+                IRouter_Original(router).pluginTransfer(_path[0], msg.sender, address(this), _amountIn);
             } else {
-                IRouter(router).pluginTransfer(_path[0], msg.sender, vault, _amountIn);
+                IRouter_Original(router).pluginTransfer(_path[0], msg.sender, vault, _amountIn);
                 _amountIn = _swap(_path, _minOut, address(this));
             }
 
             uint256 afterFeeAmount = _collectFees(msg.sender, _path, _amountIn, _indexToken, _isLong, _sizeDelta);
-            IERC20(_path[_path.length - 1]).safeTransfer(vault, afterFeeAmount);
+            IERC20_Original(_path[_path.length - 1]).safeTransfer(vault, afterFeeAmount);
         }
 
         _increasePosition(msg.sender, _path[_path.length - 1], _indexToken, _sizeDelta, _isLong, _price);
@@ -119,12 +119,12 @@ contract PositionManager is BasePositionManager {
             uint256 _amountIn = msg.value;
 
             if (_path.length > 1) {
-                IERC20(weth).safeTransfer(vault, msg.value);
+                IERC20_Original(weth).safeTransfer(vault, msg.value);
                 _amountIn = _swap(_path, _minOut, address(this));
             }
 
             uint256 afterFeeAmount = _collectFees(msg.sender, _path, _amountIn, _indexToken, _isLong, _sizeDelta);
-            IERC20(_path[_path.length - 1]).safeTransfer(vault, afterFeeAmount);
+            IERC20_Original(_path[_path.length - 1]).safeTransfer(vault, afterFeeAmount);
         }
 
         _increasePosition(msg.sender, _path[_path.length - 1], _indexToken, _sizeDelta, _isLong, _price);
@@ -170,7 +170,7 @@ contract PositionManager is BasePositionManager {
         require(_path.length == 2, "PositionManager: invalid _path.length");
 
         uint256 amount = _decreasePosition(msg.sender, _path[0], _indexToken, _collateralDelta, _sizeDelta, _isLong, address(this), _price);
-        IERC20(_path[0]).safeTransfer(vault, amount);
+        IERC20_Original(_path[0]).safeTransfer(vault, amount);
         _swap(_path, _minOut, _receiver);
     }
 
@@ -188,7 +188,7 @@ contract PositionManager is BasePositionManager {
         require(_path[_path.length - 1] == weth, "PositionManager: invalid _path");
 
         uint256 amount = _decreasePosition(msg.sender, _path[0], _indexToken, _collateralDelta, _sizeDelta, _isLong, address(this), _price);
-        IERC20(_path[0]).safeTransfer(vault, amount);
+        IERC20_Original(_path[0]).safeTransfer(vault, amount);
         uint256 amountOut = _swap(_path, _minOut, address(this));
         _transferOutETHWithGasLimitFallbackToWeth(amountOut, _receiver);
     }
@@ -201,27 +201,27 @@ contract PositionManager is BasePositionManager {
         address _feeReceiver
     ) external nonReentrant onlyLiquidator {
         address _vault = vault;
-        address timelock = IVault(_vault).gov();
-        (uint256 size, , , , , , , ) = IVault(vault).getPosition(_account, _collateralToken, _indexToken, _isLong);
+        address timelock = IVault_Original(_vault).gov();
+        (uint256 size, , , , , , , ) = IVault_Original(vault).getPosition(_account, _collateralToken, _indexToken, _isLong);
 
-        uint256 markPrice = _isLong ? IVault(_vault).getMinPrice(_indexToken) : IVault(_vault).getMaxPrice(_indexToken);
+        uint256 markPrice = _isLong ? IVault_Original(_vault).getMinPrice(_indexToken) : IVault_Original(_vault).getMaxPrice(_indexToken);
         // should be called strictly before position is updated in Vault
-        IShortsTracker(shortsTracker).updateGlobalShortData(_account, _collateralToken, _indexToken, _isLong, size, markPrice, false);
+        IShortsTracker_Original(shortsTracker_Original).updateGlobalShortData(_account, _collateralToken, _indexToken, _isLong, size, markPrice, false);
 
-        ITimelock(timelock).enableLeverage(_vault);
-        IVault(_vault).liquidatePosition(_account, _collateralToken, _indexToken, _isLong, _feeReceiver);
-        ITimelock(timelock).disableLeverage(_vault);
+        ITimelock_Original(timelock).enableLeverage(_vault);
+        IVault_Original(_vault).liquidatePosition(_account, _collateralToken, _indexToken, _isLong, _feeReceiver);
+        ITimelock_Original(timelock).disableLeverage(_vault);
     }
 
     function executeSwapOrder(address _account, uint256 _orderIndex, address payable _feeReceiver) external onlyOrderKeeper {
-        IOrderBook(orderBook).executeSwapOrder(_account, _orderIndex, _feeReceiver);
+        IOrderBook_Original(orderBook).executeSwapOrder(_account, _orderIndex, _feeReceiver);
     }
 
     function executeIncreaseOrder(address _account, uint256 _orderIndex, address payable _feeReceiver) external onlyOrderKeeper {
         _validateIncreaseOrder(_account, _orderIndex);
 
         address _vault = vault;
-        address timelock = IVault(_vault).gov();
+        address timelock = IVault_Original(_vault).gov();
 
         (
             /*address purchaseToken*/,
@@ -233,22 +233,22 @@ contract PositionManager is BasePositionManager {
             /*uint256 triggerPrice*/,
             /*bool triggerAboveThreshold*/,
             /*uint256 executionFee*/
-        ) = IOrderBook(orderBook).getIncreaseOrder(_account, _orderIndex);
+        ) = IOrderBook_Original(orderBook).getIncreaseOrder(_account, _orderIndex);
 
-        uint256 markPrice = isLong ? IVault(_vault).getMaxPrice(indexToken) : IVault(_vault).getMinPrice(indexToken);
+        uint256 markPrice = isLong ? IVault_Original(_vault).getMaxPrice(indexToken) : IVault_Original(_vault).getMinPrice(indexToken);
         // should be called strictly before position is updated in Vault
-        IShortsTracker(shortsTracker).updateGlobalShortData(_account, collateralToken, indexToken, isLong, sizeDelta, markPrice, true);
+        IShortsTracker_Original(shortsTracker_Original).updateGlobalShortData(_account, collateralToken, indexToken, isLong, sizeDelta, markPrice, true);
 
-        ITimelock(timelock).enableLeverage(_vault);
-        IOrderBook(orderBook).executeIncreaseOrder(_account, _orderIndex, _feeReceiver);
-        ITimelock(timelock).disableLeverage(_vault);
+        ITimelock_Original(timelock).enableLeverage(_vault);
+        IOrderBook_Original(orderBook).executeIncreaseOrder(_account, _orderIndex, _feeReceiver);
+        ITimelock_Original(timelock).disableLeverage(_vault);
 
         _emitIncreasePositionReferral(_account, sizeDelta);
     }
 
     function executeDecreaseOrder(address _account, uint256 _orderIndex, address payable _feeReceiver) external onlyOrderKeeper {
         address _vault = vault;
-        address timelock = IVault(_vault).gov();
+        address timelock = IVault_Original(_vault).gov();
 
         (
             address collateralToken,
@@ -259,15 +259,15 @@ contract PositionManager is BasePositionManager {
             /*uint256 triggerPrice*/,
             /*bool triggerAboveThreshold*/,
             /*uint256 executionFee*/
-        ) = IOrderBook(orderBook).getDecreaseOrder(_account, _orderIndex);
+        ) = IOrderBook_Original(orderBook).getDecreaseOrder(_account, _orderIndex);
 
-        uint256 markPrice = isLong ? IVault(_vault).getMinPrice(indexToken) : IVault(_vault).getMaxPrice(indexToken);
+        uint256 markPrice = isLong ? IVault_Original(_vault).getMinPrice(indexToken) : IVault_Original(_vault).getMaxPrice(indexToken);
         // should be called strictly before position is updated in Vault
-        IShortsTracker(shortsTracker).updateGlobalShortData(_account, collateralToken, indexToken, isLong, sizeDelta, markPrice, false);
+        IShortsTracker_Original(shortsTracker_Original).updateGlobalShortData(_account, collateralToken, indexToken, isLong, sizeDelta, markPrice, false);
 
-        ITimelock(timelock).enableLeverage(_vault);
-        IOrderBook(orderBook).executeDecreaseOrder(_account, _orderIndex, _feeReceiver);
-        ITimelock(timelock).disableLeverage(_vault);
+        ITimelock_Original(timelock).enableLeverage(_vault);
+        IOrderBook_Original(orderBook).executeDecreaseOrder(_account, _orderIndex, _feeReceiver);
+        ITimelock_Original(timelock).disableLeverage(_vault);
 
         _emitDecreasePositionReferral(_account, sizeDelta);
     }
@@ -283,7 +283,7 @@ contract PositionManager is BasePositionManager {
             , // triggerPrice
             , // triggerAboveThreshold
             // executionFee
-        ) = IOrderBook(orderBook).getIncreaseOrder(_account, _orderIndex);
+        ) = IOrderBook_Original(orderBook).getIncreaseOrder(_account, _orderIndex);
 
         _validateMaxGlobalSize(_indexToken, _isLong, _sizeDelta);
 
@@ -295,7 +295,7 @@ contract PositionManager is BasePositionManager {
         // if the position size is not increasing, this is a collateral deposit
         require(_sizeDelta > 0, "PositionManager: long deposit");
 
-        IVault _vault = IVault(vault);
+        IVault_Original _vault = IVault_Original(vault);
         (uint256 size, uint256 collateral, , , , , , ) = _vault.getPosition(_account, _collateralToken, _indexToken, _isLong);
 
         // if there is no existing position, do not charge a fee

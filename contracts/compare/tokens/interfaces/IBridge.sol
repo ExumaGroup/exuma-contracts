@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IBridge {
+interface IBridge_Original {
     function wrap(uint256 _amount, address _receiver) external;
     function unwrap(uint256 _amount, address _receiver) external;
 }

@@ -5,7 +5,7 @@ pragma solidity 0.6.12;
 import "./interfaces/IUSDG.sol";
 import "./YieldToken.sol";
 
-contract USDG is YieldToken, IUSDG {
+contract USDG_Original is YieldToken_Original, IUSDG_Original {
 
     mapping (address => bool) public vaults;
 
@@ -14,7 +14,7 @@ contract USDG is YieldToken, IUSDG {
         _;
     }
 
-    constructor(address _vault) public YieldToken("USD Gambit", "USDG", 0) {
+    constructor(address _vault) public YieldToken_Original("USD Gambit", "USDG", 0) {
         vaults[_vault] = true;
     }
 

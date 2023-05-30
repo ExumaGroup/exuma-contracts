@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IRewardDistributor {
+interface IRewardDistributor_Original {
     function rewardToken() external view returns (address);
     function tokensPerInterval() external view returns (uint256);
     function pendingRewards() external view returns (uint256);

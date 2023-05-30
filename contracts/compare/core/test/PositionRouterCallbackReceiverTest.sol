@@ -4,7 +4,7 @@ pragma solidity ^0.6.0;
 
 import "../interfaces/IPositionRouterCallbackReceiver.sol";
 
-contract PositionRouterCallbackReceiverTest is IPositionRouterCallbackReceiver {
+contract PositionRouterCallbackReceiverTest_Original is IPositionRouterCallbackReceiver_Original {
     event CallbackCalled(
         bytes32 positionKey,
         bool isExecuted,

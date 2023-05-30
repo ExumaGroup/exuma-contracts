@@ -4,7 +4,7 @@ pragma solidity 0.6.12;
 
 import "./interfaces/IPancakePair.sol";
 
-contract PancakePair is IPancakePair {
+contract PancakePair_Original is IPancakePair_Original {
     uint112 private reserve0;           // uses single storage slot, accessible via getReserves
     uint112 private reserve1;           // uses single storage slot, accessible via getReserves
     uint32  private blockTimestampLast; // uses single storage slot, accessible via getReserves

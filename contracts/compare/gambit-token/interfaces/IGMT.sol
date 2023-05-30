@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IGMT {
+interface IGMT_Original {
     function beginMigration() external;
     function endMigration() external;
 }

@@ -5,7 +5,7 @@ import "hardhat/console.sol";
 
 pragma solidity ^0.6.0;
 
-contract MaliciousTraderTest {
+contract MaliciousTraderTest_Original {
     event Received();
 
     address public positionRouter;

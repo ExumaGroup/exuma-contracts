@@ -2,7 +2,7 @@
 
 pragma solidity 0.6.12;
 
-interface IPositionRouter {
+interface IPositionRouter_Original {
     function increasePositionRequestKeysStart() external view returns (uint256);
     function decreasePositionRequestKeysStart() external view returns (uint256);
     function increasePositionRequestKeys(uint256 index) external view returns (bytes32);

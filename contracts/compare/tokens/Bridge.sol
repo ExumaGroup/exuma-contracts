@@ -9,9 +9,9 @@ import "../libraries/utils/ReentrancyGuard.sol";
 
 import "../access/Governable.sol";
 
-contract Bridge is ReentrancyGuard, Governable {
-    using SafeMath for uint256;
-    using SafeERC20 for IERC20;
+contract Bridge_Original is ReentrancyGuard_Original, Governable_Original {
+    using SafeMath_Original for uint256;
+    using SafeERC20_Original for IERC20_Original;
 
     address public token;
     address public wToken;
@@ -22,17 +22,17 @@ contract Bridge is ReentrancyGuard, Governable {
     }
 
     function wrap(uint256 _amount, address _receiver) external nonReentrant {
-        IERC20(token).safeTransferFrom(msg.sender, address(this), _amount);
-        IERC20(wToken).safeTransfer(_receiver, _amount);
+        IERC20_Original(token).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20_Original(wToken).safeTransfer(_receiver, _amount);
     }
 
     function unwrap(uint256 _amount, address _receiver) external nonReentrant {
-        IERC20(wToken).safeTransferFrom(msg.sender, address(this), _amount);
-        IERC20(token).safeTransfer(_receiver, _amount);
+        IERC20_Original(wToken).safeTransferFrom(msg.sender, address(this), _amount);
+        IERC20_Original(token).safeTransfer(_receiver, _amount);
     }
 
     // to help users who accidentally send their tokens to this contract
-    function withdrawToken(address _token, address _account, uint256 _amount) external onlyGov {
-        IERC20(_token).safeTransfer(_account, _amount);
+    function withdrawToken_Original(address _token, address _account, uint256 _amount) external onlyGov {
+        IERC20_Original(_token).safeTransfer(_account, _amount);
     }
 }
